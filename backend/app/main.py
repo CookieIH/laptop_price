@@ -125,7 +125,6 @@ def get_laptops():
     limit = request.args.get("limit", 100, type=int)
 
     conn = get_db()
-
     if conn is None:
         return jsonify({"error": "数据库未就绪，请先运行 spider.py 生成数据"}), 500
     
@@ -137,26 +136,28 @@ def get_laptops():
     rows = cursor.fetchall()
     conn.close()
 
-    # 转成字典
+    # 转成字典（✅ 字段名与前端一致）
     result = []
     for r in rows:
         result.append({
             "id": r[0],
-            "model": r[1],
-            "cpu_brand": r[2],
-            "cpu": r[3],
-            "cpu_cores": r[4],
-            "cpu_threads": r[5],
-            "Memory": r[6],
-            "storage": r[7],
-            "gpu_brand": r[8],
-            "gpu": r[9],
-            "price_USD": "%.2f" % r[10],
-            "rating": r[11],
-
+            "brand": r[1] if r[1] else "未知品牌",      # ✅ 加上 brand
+            "name": r[2] if r[2] else "未知型号",        # ✅ 加上 name
+            "cpu_brand": r[3],
+            "cpu": r[4],
+            "cpu_cores": r[5],
+            "cpu_threads": r[6],
+            "memory": r[7],
+            "storage": r[8],
+            "gpu_brand": r[9],
+            "gpu": r[10],
+            "price": float(r[11]) if r[11] is not None else 0,  # ✅ 改为 price
+            "rating": r[12],
+            "review_count": r[13] if len(r) > 13 else 0,
+            "source": r[14] if len(r) > 14 else "",
+            "crawl_date": r[15] if len(r) > 15 else ""
         })
     return jsonify(result)
-
 @app.route("/api/stats/brand_avg")
 def brand_avg():
     """各品牌均价"""
