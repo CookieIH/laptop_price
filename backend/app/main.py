@@ -141,12 +141,15 @@ def get_laptops():
     result = []
     for r in rows:
         result.append({
-            "id": r[0],
-            "brand": r[1],
-            "model": r[2],
-            "price": r[3],
-            "memory": r[6],
-            "rating": r[8]
+            "brand": r[0],
+            "category": r[7],
+            "model": r[1],
+            "price": r[6],
+            "cpu": r[2],
+            "gpu": r[5],
+            "storage": r[4],
+            "memory": r[3],
+            "rating": r[8],
         })
     return jsonify(result)
 
@@ -177,8 +180,9 @@ def price_dist():
     df = pd.read_sql("SELECT price FROM laptops WHERE price > 0", conn)
     conn.close()
 
-    bins = [0, 3000, 5000, 7000, 10000, 15000, 30000]
-    labels = ["0-3k", "3k-5k", "5k-7k", "7k-10k", "10k-15k", "15k+"]
+    # 美元价格区间
+    bins = [0, 300, 500, 800, 1000, 1500, 2000, 3000, 5000]
+    labels = ["0-300", "300-500", "500-800", "800-1000", "1000-1500", "1500-2000","2000-3000", "3000+"]
     df["range"] = pd.cut(df["price"], bins=bins, labels=labels, right=False)
 
     result = df["range"].value_counts().sort_index().reset_index()

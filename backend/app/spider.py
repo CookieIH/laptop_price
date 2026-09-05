@@ -1,4 +1,5 @@
 """
+暂时放弃爬取京东数据，使用公开数据集
 爬虫模块 - 爬取京东笔记本数据
 使用 Selenium 模拟浏览器
 """
@@ -88,7 +89,7 @@ def fetch_laptops():
     
     # 文件路径
     base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    file_path = os.path.join(base_dir, "data", "laptops.csv")
+    file_path = os.path.join(base_dir, "input_data", "laptops.csv")
     
     print(f"📂 正在读取数据集: {file_path}")
     

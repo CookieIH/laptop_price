@@ -22,7 +22,7 @@ Laptop_Price/
 │ │ └── clean.csv               # 清洗后数据（P3 产出）
 │ └─── requirements.txt # Python 依赖清单
 │
-├── data/    # 项目数据根目录（与 backend/data 同步）
+├── input_data/    # 项目数据根目录（用于外部输入）
 │ └── laptops.csv       # 公开原始数据集（备份）
 │
 ├── docs/    # 项目文档
