@@ -28,7 +28,25 @@ Laptop_Price/
 ├── docs/    # 项目文档
 │ └── 途中遇到的问题.md  # 开发问题记录
 │
-├── frontend/ # 前端代码
+├── frontend/ # 前端代码（React + Vite）
+│ ├── public/
+│ │ └── index.html              # HTML 入口
+│ ├── src/
+│ │ ├── components/             # React 组件
+│ │ │ ├── Dashboard/
+│ │ │ │ └── StatsCards.jsx      # 统计卡片
+│ │ │ └── Charts/
+│ │ │ ├── BrandChart.jsx        # 品牌均价柱状图
+│ │ │ └── PriceDistChart.jsx    # 价格分布饼图
+│ │ ├── services/
+│ │ │ └── api.js                # API 调用服务
+│ │ ├── styles/
+│ │ │ └── main.css              # 全局样式
+│ │ ├── App.jsx                 # 主应用组件
+│ │ └── main.jsx                # 应用入口
+│ ├── package.json              # 前端依赖
+│ └── vite.config.js            # Vite 配置
+│
 │
 ├── .gitignore # Git 忽略文件
 └── README.md # 项目说明文档（本文件）
