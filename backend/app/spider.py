@@ -81,7 +81,6 @@ def fetch_laptops():
     """
     读取公开数据集，标准化为统一格式
     
-    输出列名: name, brand, price, review_count, source, crawl_date
     """
     import pandas as pd
     import os
@@ -107,8 +106,8 @@ def fetch_laptops():
         # brand 列
         if "Company" in df.columns:
             result_df["brand"] = df["Company"]
-        elif "Brand" in df.columns:
-            result_df["brand"] = df["Brand"]
+        elif "brand" in df.columns:
+            result_df["brand"] = df["brand"]
         else:
             result_df["brand"] = "未知品牌"
 
@@ -121,14 +120,38 @@ def fetch_laptops():
             result_df["name"] = df["Model"]
         else:
             result_df["name"] = "未知型号"
-        
+
+        # CPU brand 列
+        if "CPU_brand" in df.columns:
+            result_df["cpu_brand"] = df["CPU_brand"]
+        elif "processor_brand" in df.columns:
+            result_df["cpu_brand"] = df["processor_brand"]
+        else:
+            result_df["cpu_brand"] = "未知CPU品牌"
+
         # CPU 列
         if "CPU" in df.columns:
             result_df["cpu"] = df["CPU"]
-        elif "Processor" in df.columns:
-            result_df["cpu"] = df["Processor"]
+        elif "processor" in df.columns:
+            result_df["cpu"] = df["processor"]
         else:
             result_df["cpu"] = "未知CPU"
+
+        # CPU cores 列
+        if "CPU_cores" in df.columns: 
+            result_df["cpu_cores"] = df["CPU_cores"]
+        elif "processor_cores" in df.columns:
+            result_df["cpu_cores"] = df["processor_cores"]
+        else:
+            result_df["cpu_cores"] = "未知核心数"
+
+        # CPU threads 列
+        if "CPU_threads" in df.columns:
+            result_df["cpu_threads"] = df["CPU_threads"]
+        elif "processor_threads" in df.columns:
+            result_df["cpu_threads"] = df["processor_threads"]
+        else:
+            result_df["cpu_threads"] = "未知线程数"
 
         # memory 列
         if "RAM_GB" in df.columns:
@@ -146,27 +169,36 @@ def fetch_laptops():
         else:
             result_df["storage"] = "未知存储"
 
+        # GPU brand 列
+        if "GPU_brand" in df.columns:
+            result_df["gpu_brand"] = df["GPU_brand"]
+        elif "gpu_brand" in df.columns:
+            result_df["gpu_brand"] = df["gpu_brand"]
+        else:
+            result_df["gpu_brand"] = "未知GPU品牌"
+
         # GPU 列
         if "GPU" in df.columns:
             result_df["gpu"] = df["GPU"]
-        elif "Graphics" in df.columns:
-            result_df["gpu"] = df["Graphics"]
+        elif "gpu_type" in df.columns:
+            result_df["gpu"] = df["gpu_type"]
         else:
             result_df["gpu"] = "未知GPU"
 
         # price 列
+        INR_TO_USD = 83.0
         if "Price_USD" in df.columns:
             result_df["price"] = df["Price_USD"]
         elif "Price" in df.columns:
-            result_df["price"] = df["Price"]
+            result_df["price"] = df["Price"] / INR_TO_USD
         else:
             result_df["price"] = 0
 
-        # category 列
-        if "Category" in df.columns:    
-            result_df["category"] = df["Category"]
+        # Rating 列
+        if "Rating" in df.columns:    
+            result_df["rating"] = df["Rating"]
         else:
-            result_df["category"] = "未知类别"
+            result_df["rating"] = "未知评分"
 
         # review_count（固定为0）
         result_df["review_count"] = 0

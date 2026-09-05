@@ -144,12 +144,17 @@ def get_laptops():
             "brand": r[0],
             "category": r[7],
             "model": r[1],
-            "price": r[6],
-            "cpu": r[2],
+            "price_USD": r[10],
+            "cpu": r[3],
             "gpu": r[5],
-            "storage": r[4],
+            "storage": r[7],
             "memory": r[3],
-            "rating": r[8],
+            "rating": r[11],
+            "cpu_cores": r[9],
+            "cpu_threads": r[6],
+            "cpu_brand": r[2],
+            "gpu_brand": r[12],
+
         })
     return jsonify(result)
 
