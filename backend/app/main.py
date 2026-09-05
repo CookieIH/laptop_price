@@ -141,19 +141,18 @@ def get_laptops():
     result = []
     for r in rows:
         result.append({
-            "brand": r[0],
-            "category": r[7],
+            "id": r[0],
             "model": r[1],
-            "price_USD": r[10],
-            "cpu": r[3],
-            "gpu": r[5],
-            "storage": r[7],
-            "memory": r[3],
-            "rating": r[11],
-            "cpu_cores": r[9],
-            "cpu_threads": r[6],
             "cpu_brand": r[2],
-            "gpu_brand": r[12],
+            "cpu": r[3],
+            "cpu_cores": r[4],
+            "cpu_threads": r[5],
+            "Memory": r[6],
+            "storage": r[7],
+            "gpu_brand": r[8],
+            "gpu": r[9],
+            "price_USD": "%.2f" % r[10],
+            "rating": r[11],
 
         })
     return jsonify(result)
