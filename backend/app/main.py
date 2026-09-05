@@ -2,10 +2,86 @@ from flask import Flask, jsonify, request
 import sqlite3
 import pandas as pd
 from config import DB_PATH
+from config import SPIDER_PATH, IMPORT_PATH
+import os
+import subprocess
+import sys
 
 app = Flask(__name__)
 
-# CORS配置（一行搞定）
+def ensure_database():
+    """确保数据库存在且有数据，否则自动生成"""
+    
+    # 检查数据库是否存在
+    db_exists = os.path.exists(DB_PATH)
+    
+    # 如果数据库存在，检查是否有数据
+    has_data = False
+    if db_exists:
+        try:
+            conn = sqlite3.connect(DB_PATH)
+            cursor = conn.cursor()
+            cursor.execute("SELECT COUNT(*) FROM laptops")
+            count = cursor.fetchone()[0]
+            has_data = count > 0
+            conn.close()
+        except:
+            has_data = False
+    
+    # 如果数据库存在且有数据，直接返回
+    if db_exists and has_data:
+        print(f"✅ 数据库已就绪: {DB_PATH} ({count} 条数据)")
+        return True
+    
+    # ===== 需要重新生成数据 =====
+    print("🔄 数据库未就绪，开始自动准备数据...")
+    
+    # 第1步：运行 spider.py 生成 raw.csv
+    if os.path.exists(SPIDER_PATH):
+        print("📂 步骤1: 运行 spider.py...")
+        result = subprocess.run(
+            [sys.executable, SPIDER_PATH],
+            capture_output=True,
+            text=True,
+            cwd=os.path.dirname(SPIDER_PATH),
+            encoding='utf-8',
+        )
+        print(result.stdout)
+        if result.returncode != 0:
+            print(f"❌ spider.py 执行失败: {result.stderr}")
+            return False
+    else:
+        print(f"❌ 找不到 spider.py: {SPIDER_PATH}")
+        return False
+
+    # 第2步：运行 import_db.py 导入数据库
+    if os.path.exists(IMPORT_PATH):
+        print("📂 步骤2: 运行 import_db.py...")
+        result = subprocess.run(
+            [sys.executable, IMPORT_PATH],
+            capture_output=True,
+            text=True,
+            cwd=os.path.dirname(IMPORT_PATH),
+            encoding='utf-8',
+        )
+        print(result.stdout)
+        if result.returncode != 0:
+            print(f"❌ import_db.py 执行失败: {result.stderr}")
+            return False
+    else:
+        print(f"❌ 找不到 import_db.py: {IMPORT_PATH}")
+        return False
+
+    print("✅ 数据准备完成！")
+
+    return True
+
+def get_db():
+    if not os.path.exists(DB_PATH):
+        return None
+    return sqlite3.connect(DB_PATH)
+
+# CORS配置
 @app.after_request
 def after_request(resp):
     resp.headers["Access-Control-Allow-Origin"] = "*"
@@ -13,7 +89,18 @@ def after_request(resp):
     return resp
 
 def get_db():
-    return sqlite3.connect(DB_PATH)
+    """获取数据库连接"""
+    # 检查数据库文件是否存在
+    if not os.path.exists(DB_PATH):
+        print(f"❌ 数据库文件不存在: {DB_PATH}")
+        print("💡 请先运行: python backend/app/spider.py")
+        return None
+    
+    try:
+        return sqlite3.connect(DB_PATH)
+    except sqlite3.Error as e:
+        print(f"❌ 连接数据库失败: {e}")
+        return None
 
 # ============= API接口 =============
 
@@ -38,6 +125,10 @@ def get_laptops():
     limit = request.args.get("limit", 100, type=int)
 
     conn = get_db()
+
+    if conn is None:
+        return jsonify({"error": "数据库未就绪，请先运行 spider.py 生成数据"}), 500
+    
     cursor = conn.cursor()
     if brand:
         cursor.execute("SELECT * FROM laptops WHERE brand = ? LIMIT ?", (brand, limit))
@@ -46,7 +137,7 @@ def get_laptops():
     rows = cursor.fetchall()
     conn.close()
 
-    # 转成字典（字段名写死，和表结构对应）
+    # 转成字典
     result = []
     for r in rows:
         result.append({
@@ -107,4 +198,9 @@ def get_brands():
     return jsonify([r[0] for r in rows])
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8000, debug=True)
+    # ===== 启动前自动准备数据 =====
+    if ensure_database():
+        print("🚀 启动 Flask 服务...")
+        app.run(host="0.0.0.0", port=8000, debug=True)
+    else:
+        print("❌ 数据准备失败，请手动检查")

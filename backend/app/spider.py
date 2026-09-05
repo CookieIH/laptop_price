@@ -3,6 +3,10 @@
 使用 Selenium 模拟浏览器
 """
 
+import sys
+import io
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+
 import os
 import time
 import random
@@ -99,14 +103,6 @@ def fetch_laptops():
         # 构建标准化 DataFrame
         result_df = pd.DataFrame()
         
-        # name 列
-        if "Product" in df.columns:
-            result_df["name"] = df["Product"]
-        elif "TypeName" in df.columns:
-            result_df["name"] = df["TypeName"]
-        else:
-            result_df["name"] = "未知型号"
-        
         # brand 列
         if "Company" in df.columns:
             result_df["brand"] = df["Company"]
@@ -114,20 +110,68 @@ def fetch_laptops():
             result_df["brand"] = df["Brand"]
         else:
             result_df["brand"] = "未知品牌"
+
+        # name 列
+        if "Product" in df.columns:
+            result_df["name"] = df["Product"]
+        elif "TypeName" in df.columns:
+            result_df["name"] = df["TypeName"]
+        elif "Model" in df.columns:
+            result_df["name"] = df["Model"]
+        else:
+            result_df["name"] = "未知型号"
         
+        # CPU 列
+        if "CPU" in df.columns:
+            result_df["cpu"] = df["CPU"]
+        elif "Processor" in df.columns:
+            result_df["cpu"] = df["Processor"]
+        else:
+            result_df["cpu"] = "未知CPU"
+
+        # memory 列
+        if "RAM_GB" in df.columns:
+            result_df["memory"] = df["RAM_GB"]
+        elif "Memory" in df.columns:
+            result_df["memory"] = df["Memory"]
+        else:
+            result_df["memory"] = "未知内存"
+
+        # storage 列
+        if "Storage_GB" in df.columns:
+            result_df["storage"] = df["Storage_GB"]
+        elif "Storage" in df.columns:
+            result_df["storage"] = df["Storage"]
+        else:
+            result_df["storage"] = "未知存储"
+
+        # GPU 列
+        if "GPU" in df.columns:
+            result_df["gpu"] = df["GPU"]
+        elif "Graphics" in df.columns:
+            result_df["gpu"] = df["Graphics"]
+        else:
+            result_df["gpu"] = "未知GPU"
+
         # price 列
-        if "Price_euros" in df.columns:
-            result_df["price"] = df["Price_euros"]
+        if "Price_USD" in df.columns:
+            result_df["price"] = df["Price_USD"]
         elif "Price" in df.columns:
             result_df["price"] = df["Price"]
         else:
             result_df["price"] = 0
-        
+
+        # category 列
+        if "Category" in df.columns:    
+            result_df["category"] = df["Category"]
+        else:
+            result_df["category"] = "未知类别"
+
         # review_count（固定为0）
         result_df["review_count"] = 0
         
         # source
-        result_df["source"] = "Kaggle"
+        result_df["source"] = "sohaibdevv"
         
         # crawl_date
         result_df["crawl_date"] = datetime.now().strftime("%Y-%m-%d")
@@ -140,7 +184,7 @@ def fetch_laptops():
         print(f"✅ 清洗后数据: {len(result_df)} 条")
         
         # 保存
-        output_path = os.path.join(base_dir, "data", "raw.csv")
+        output_path = os.path.join(base_dir, "backend","data", "raw.csv")
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
         result_df.to_csv(output_path, index=False, encoding="utf-8-sig")
         print(f"✅ 已保存到: {output_path}")
@@ -148,7 +192,7 @@ def fetch_laptops():
         # 预览
         print("\n📋 数据预览（前3条）:")
         for i, row in result_df.head(3).iterrows():
-            print(f"  {i+1}. {row['brand']} | {row['name'][:30]}... | ¥{row['price']}")
+            print(f"  {i+1}. {row['brand']} | {row['name'][:30]}... | ${row['price']}")
         
         return result_df.to_dict(orient="records")
         

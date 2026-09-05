@@ -1,4 +1,6 @@
-# 有什么要求或者问题都在这上面说 直接更新在最上面就行
+# 有什么通知都在这上面说 直接更新在最上面就行
+
+### 直接运行main.py就可以开启api
 
 ### 执行 pip install -r requirements.txt 一键安装所有依赖
 
@@ -11,7 +13,9 @@ Laptop_Price/
 │ │ ├── spider.py               # 数据采集模块（数据加载）
 │ │ ├── config.py               # 配置文件（数据库路径、参数等）
 │ │ ├── db_helper.py            # 数据库工具函数（查询封装）
+│ │ ├── import_db.py            # 数据库导入
 │ │ └── test.py                 # 测试脚本（Selenium 环境验证）
+| | 
 │ ├── data/             # 数据目录
 │ │ ├── laptops.db              # SQLite 数据库文件
 │ │ ├── raw.csv                 # 原始数据（字段标准化后）

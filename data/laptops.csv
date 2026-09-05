@@ -1,31 +1,31 @@
-﻿name,brand,price,review_count,source,crawl_date
-MacBook Air,Apple,0.0,0,Kaggle,2026-09-05
-Vivobook 16,ASUS,0.0,0,Kaggle,2026-09-05
-IdeaPad Slim 3,Lenovo,0.0,0,Kaggle,2026-09-05
-Aspire Go 15,Acer,0.0,0,Kaggle,2026-09-05
-Victus 15,HP,0.0,0,Kaggle,2026-09-05
-Inspiron 14,Dell,0.0,0,Kaggle,2026-09-05
-TUF Gaming A16,ASUS,0.0,0,Kaggle,2026-09-05
-Yoga 7i,Lenovo,0.0,0,Kaggle,2026-09-05
-MacBook Pro 14,Apple,0.0,0,Kaggle,2026-09-05
-Nitro V 16,Acer,0.0,0,Kaggle,2026-09-05
-Cyborg 15,MSI,0.0,0,Kaggle,2026-09-05
-Galaxy Book4,Samsung,0.0,0,Kaggle,2026-09-05
-ExpertBook P5,ASUS,0.0,0,Kaggle,2026-09-05
-ThinkPad E14,Lenovo,0.0,0,Kaggle,2026-09-05
-OmniBook X,HP,0.0,0,Kaggle,2026-09-05
-Vostro 3520,Dell,0.0,0,Kaggle,2026-09-05
-Swift Go 14,Acer,0.0,0,Kaggle,2026-09-05
-Surface Laptop 7,Microsoft,0.0,0,Kaggle,2026-09-05
-ROG Zephyrus G14,ASUS,0.0,0,Kaggle,2026-09-05
-LOQ 15,Lenovo,0.0,0,Kaggle,2026-09-05
-Zenbook S 14,ASUS,0.0,0,Kaggle,2026-09-05
-Pavilion 15,HP,0.0,0,Kaggle,2026-09-05
-Legion Slim 5,Lenovo,0.0,0,Kaggle,2026-09-05
-XPS 13,Dell,0.0,0,Kaggle,2026-09-05
-MacBook Pro 16,Apple,0.0,0,Kaggle,2026-09-05
-G5,Gigabyte,0.0,0,Kaggle,2026-09-05
-Chromebook Spin,Acer,0.0,0,Kaggle,2026-09-05
-ProArt P16,ASUS,0.0,0,Kaggle,2026-09-05
-ThinkBook 16,Lenovo,0.0,0,Kaggle,2026-09-05
-Envy x360,HP,0.0,0,Kaggle,2026-09-05
+﻿Brand,Model,CPU,RAM_GB,Storage_GB,GPU,Price_USD,Category
+Apple,MacBook Air,M4,16,512,Integrated,1299,Premium
+ASUS,Vivobook 16,Core Ultra 5,16,512,Integrated,649,Budget
+Lenovo,IdeaPad Slim 3,Ryzen 5,8,256,Integrated,429,Budget
+Acer,Aspire Go 15,Intel N100,8,128,Integrated,299,Ultra-Budget
+HP,Victus 15,Ryzen 5,16,512,RTX 5050,799,Budget Gaming
+Dell,Inspiron 14,Core Ultra 7,16,1024,Integrated,899,Mid-Range
+ASUS,TUF Gaming A16,Ryzen 7,16,1024,RTX 5060,949,Budget Gaming
+Lenovo,Yoga 7i,Core Ultra 5,16,512,Integrated,749,2-in-1
+Apple,MacBook Pro 14,M4 Pro,24,512,Integrated,1999,Professional
+Acer,Nitro V 16,Ryzen 7,16,512,RTX 5050,629,Budget Gaming
+MSI,Cyborg 15,Core i7-13th,16,512,RTX 4050,699,Budget Gaming
+Samsung,Galaxy Book4,Snapdragon X,16,512,Integrated,999,Ultraportable
+ASUS,ExpertBook P5,Core Ultra 7,32,1024,Integrated,1250,Business
+Lenovo,ThinkPad E14,Core Ultra 5,16,512,Integrated,670,Budget Business
+HP,OmniBook X,Ryzen AI 7,16,512,Integrated,679,Budget
+Dell,Vostro 3520,Core i5-12th,8,256,Integrated,399,Budget
+Acer,Swift Go 14,Core Ultra 7,16,512,Integrated,849,Mid-Range
+Microsoft,Surface Laptop 7,Snapdragon X,16,512,Integrated,1299,Premium
+ASUS,ROG Zephyrus G14,Ryzen 9,32,1024,RTX 5070,1899,Gaming
+Lenovo,LOQ 15,Core i5-13th,12,512,RTX 4050,749,Budget Gaming
+ASUS,Zenbook S 14,Core Ultra 7,32,1024,Integrated,1499,Premium
+HP,Pavilion 15,Ryzen 5,16,512,Integrated,549,Budget
+Lenovo,Legion Slim 5,Ryzen 7,16,1024,RTX 5060,1199,Gaming
+Dell,XPS 13,Core Ultra 5,16,512,Integrated,1099,Premium
+Apple,MacBook Pro 16,M4 Max,48,1024,Integrated,3499,Professional
+Gigabyte,G5,Core i5-12th,16,512,RTX 4060,799,Budget Gaming
+Acer,Chromebook Spin,MediaTek,4,64,Integrated,249,Ultra-Budget
+ASUS,ProArt P16,Ryzen AI 9,64,2048,RTX 5080,3299,Professional
+Lenovo,ThinkBook 16,Core Ultra 5,16,512,Integrated,799,Business
+HP,Envy x360,Core Ultra 7,16,1024,Integrated,949,2-in-1
