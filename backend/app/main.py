@@ -122,7 +122,7 @@ def index():
 def get_laptops():
     """获取笔记本列表（支持品牌筛选）"""
     brand = request.args.get("brand")
-    limit = request.args.get("limit", 100, type=int)
+    limit = request.args.get("limit", 500, type=int)
 
     conn = get_db()
     if conn is None:
@@ -140,22 +140,22 @@ def get_laptops():
     result = []
     for r in rows:
         result.append({
-            "id": r[0],
-            "brand": r[1] if r[1] else "未知品牌",      # ✅ 加上 brand
-            "name": r[2] if r[2] else "未知型号",        # ✅ 加上 name
-            "cpu_brand": r[3],
-            "cpu": r[4],
-            "cpu_cores": r[5],
-            "cpu_threads": r[6],
-            "memory": r[7],
-            "storage": r[8],
-            "gpu_brand": r[9],
-            "gpu": r[10],
-            "price": float(r[11]) if r[11] is not None else 0,  # ✅ 改为 price
-            "rating": r[12],
-            "review_count": r[13] if len(r) > 13 else 0,
-            "source": r[14] if len(r) > 14 else "",
-            "crawl_date": r[15] if len(r) > 15 else ""
+            "id": r[12],
+            "brand": r[0] if r[0] else "未知品牌",      # ✅ 加上 brand
+            "name": r[1] if r[1] else "未知型号",        # ✅ 加上 name
+            "cpu_brand": r[2],
+            "cpu": r[3],
+            "cpu_cores": r[4],
+            "cpu_threads": r[5],
+            "memory": r[6],
+            "storage": r[7],
+            "gpu_brand": r[8],
+            "gpu": r[9],
+            "price": float(r[10]) if r[10] is not None else 0,  # ✅ 改为 price
+            "rating": r[11],
+            "review_count": r[15] if len(r) > 15 else 0,
+            "source": r[13] if len(r) > 13 else "",
+            "crawl_date": r[14] if len(r) > 14 else ""
         })
     return jsonify(result)
 @app.route("/api/stats/brand_avg")
