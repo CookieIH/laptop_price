@@ -142,7 +142,7 @@ function OverviewTab({ laptops, brandAvg, priceDist }) {
           <h3>🏷️ 品牌均价排名</h3>
           {brandAvg.length > 0 ? (
             <div className="simple-chart">
-              {brandAvg.slice(0, 10).map((item, i) => (
+              {brandAvg.slice(0, 8).map((item, i) => (
                 <div key={i} className="chart-bar-row">
                   <span className="bar-label">{item.brand}</span>
                   <div className="bar-track">

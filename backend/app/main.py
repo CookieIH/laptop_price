@@ -122,7 +122,7 @@ def index():
 def get_laptops():
     """获取笔记本列表（支持品牌筛选）"""
     brand = request.args.get("brand")
-    limit = request.args.get("limit", 500, type=int)
+    limit = request.args.get("limit", 991, type=int)
 
     conn = get_db()
     if conn is None:
