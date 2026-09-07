@@ -1,324 +1,393 @@
-import React, { useState, useEffect } from 'react'
-import './App.css'
+import React, { useEffect, useState } from "react";
+import "./styles/global.css";
+
+import Navbar from "./components/Layout/Navbar";
+import Footer from "./components/Layout/Footer";
+
+import Home from "./pages/Home";
+import Search from "./pages/Search";
+import Recommend from "./pages/Recommend";
+import Analysis from "./pages/Analysis";
+
+import {
+  getLaptops,
+  getBrands,
+  getBrandAvg,
+  getPriceDist,
+} from "./services/api";
+
 
 function App() {
-  const [laptops, setLaptops] = useState([])
-  const [brandAvg, setBrandAvg] = useState([])
-  const [priceDist, setPriceDist] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState('overview')
 
-  // 获取数据
+  // ==========================================
+  // 当前页面
+  // ==========================================
+
+  const [currentPage, setCurrentPage] = useState("home");
+
+
+  // ==========================================
+  // 后端数据
+  // ==========================================
+
+  const [laptops, setLaptops] = useState([]);
+
+  const [brands, setBrands] = useState([]);
+
+  const [brandAvg, setBrandAvg] = useState([]);
+
+  const [priceDist, setPriceDist] = useState([]);
+
+
+  // ==========================================
+  // 加载状态
+  // ==========================================
+
+  const [loading, setLoading] = useState(true);
+
+  const [error, setError] = useState("");
+
+
+  // ==========================================
+  // 页面启动时加载数据
+  // ==========================================
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [laptopsRes, brandRes, priceRes] = await Promise.all([
-          fetch('/api/laptops').then(res => res.json()),
-          fetch('/api/stats/brand_avg').then(res => res.json()),
-          fetch('/api/stats/price_dist').then(res => res.json())
-        ])
-        setLaptops(Array.isArray(laptopsRes) ? laptopsRes : [])
-        setBrandAvg(Array.isArray(brandRes) ? brandRes : [])
-        setPriceDist(Array.isArray(priceRes) ? priceRes : [])
-      } catch (err) {
-        console.error('获取数据失败:', err)
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchData()
-  }, [])
 
-  if (loading) {
-    return (
-      <div className="loading-container">
-        <div className="loading-spinner"></div>
-        <p>加载数据中...</p>
-      </div>
-    )
+    loadData();
+
+  }, []);
+
+
+  // ==========================================
+  // 从 Flask API 获取数据
+  // ==========================================
+
+  async function loadData() {
+
+    try {
+
+      setLoading(true);
+
+      setError("");
+
+
+      /*
+       * 同时请求四个 API
+       *
+       * /api/laptops
+       * /api/options/brands
+       * /api/stats/brand_avg
+       * /api/stats/price_dist
+       */
+
+      const [
+        laptopData,
+        brandData,
+        brandAverageData,
+        priceDistributionData,
+      ] = await Promise.all([
+
+        getLaptops({
+          limit: 991,
+        }),
+
+        getBrands(),
+
+        getBrandAvg(),
+
+        getPriceDist(),
+
+      ]);
+
+
+      // ======================================
+      // 保存笔记本数据
+      // ======================================
+
+      setLaptops(
+        Array.isArray(laptopData)
+          ? laptopData
+          : []
+      );
+
+
+      // ======================================
+      // 保存品牌数据
+      // ======================================
+
+      setBrands(
+        Array.isArray(brandData)
+          ? brandData
+          : []
+      );
+
+
+      // ======================================
+      // 保存品牌均价数据
+      // ======================================
+
+      setBrandAvg(
+        Array.isArray(brandAverageData)
+          ? brandAverageData
+          : []
+      );
+
+
+      // ======================================
+      // 保存价格分布数据
+      // ======================================
+
+      setPriceDist(
+        Array.isArray(priceDistributionData)
+          ? priceDistributionData
+          : []
+      );
+
+
+    } catch (err) {
+
+      console.error(
+        "获取后端数据失败:",
+        err
+      );
+
+      setError(
+        "无法连接 Flask 后端服务，请检查后端是否正常启动。"
+      );
+
+    } finally {
+
+      setLoading(false);
+
+    }
+
   }
 
-  return (
-    <div className="app-container">
-      {/* 头部 */}
-      <header className="app-header">
-        <h1>📊 笔记本市场价格分析系统</h1>
-        <p>基于 {laptops.length} 条真实数据 · 价格单位 USD</p>
-      </header>
 
-      {/* Tab 切换 */}
-      <div className="tab-bar">
-        <button 
-          className={activeTab === 'overview' ? 'tab active' : 'tab'}
-          onClick={() => setActiveTab('overview')}
-        >
-          📈 概览看板
-        </button>
-        <button 
-          className={activeTab === 'brands' ? 'tab active' : 'tab'}
-          onClick={() => setActiveTab('brands')}
-        >
-          🏷️ 品牌分析
-        </button>
-        <button 
-          className={activeTab === 'list' ? 'tab active' : 'tab'}
-          onClick={() => setActiveTab('list')}
-        >
-          📋 数据列表
-        </button>
-      </div>
+  // ==========================================
+  // 页面切换
+  // ==========================================
 
-      {/* 内容区 */}
-      <div className="tab-content">
-        {activeTab === 'overview' && (
-          <OverviewTab 
-            laptops={laptops} 
-            brandAvg={brandAvg} 
-            priceDist={priceDist} 
-          />
-        )}
-        {activeTab === 'brands' && (
-          <BrandTab brandAvg={brandAvg} laptops={laptops} />
-        )}
-        {activeTab === 'list' && (
-          <ListTab laptops={laptops} />
-        )}
-      </div>
+  function handlePageChange(page) {
 
-      {/* 底部 */}
-      <footer className="app-footer">
-        <p>软件开发实践1 · 笔记本价格分析项目</p>
-      </footer>
-    </div>
-  )
-}
+    setCurrentPage(page);
 
-// ========== 概览看板 Tab ==========
-function OverviewTab({ laptops, brandAvg, priceDist }) {
-  // 计算总览指标
-  const total = laptops.length
-  const avgPrice = laptops.length > 0 
-    ? (laptops.reduce((sum, item) => sum + (item.price || 0), 0) / laptops.length).toFixed(0)
-    : 0
-  const maxPrice = laptops.length > 0 
-    ? Math.max(...laptops.map(item => item.price || 0)).toFixed(0)
-    : 0
-  const minPrice = laptops.length > 0 
-    ? Math.min(...laptops.map(item => item.price || 0)).toFixed(0)
-    : 0
+    // 切换页面时回到顶部
 
-  // 品牌数量
-  const brandCount = new Set(laptops.map(item => item.brand)).size
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
 
-  return (
-    <div>
-      {/* 统计卡片 */}
-      <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-value">{total}</div>
-          <div className="stat-label">总数据量</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-value">${avgPrice}</div>
-          <div className="stat-label">平均价格</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-value">${maxPrice}</div>
-          <div className="stat-label">最高价格</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-value">${minPrice}</div>
-          <div className="stat-label">最低价格</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-value">{brandCount}</div>
-          <div className="stat-label">品牌数量</div>
-        </div>
-      </div>
+  }
 
-      {/* 两个图表占位（后面用 ECharts 替换） */}
-      <div className="charts-row">
-        <div className="chart-box">
-          <h3>🏷️ 品牌均价排名</h3>
-          {brandAvg.length > 0 ? (
-            <div className="simple-chart">
-              {brandAvg.slice(0, 8).map((item, i) => (
-                <div key={i} className="chart-bar-row">
-                  <span className="bar-label">{item.brand}</span>
-                  <div className="bar-track">
-                    <div 
-                      className="bar-fill" 
-                      style={{ 
-                        width: `${Math.min((item.avg_price / Math.max(...brandAvg.map(b => b.avg_price))) * 100, 100)}%`,
-                        background: `hsl(${i * 30}, 70%, 50%)`
-                      }}
-                    ></div>
-                  </div>
-                  <span className="bar-value">${item.avg_price?.toFixed(0)}</span>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="no-data">暂无品牌数据</p>
-          )}
-        </div>
 
-        <div className="chart-box">
-          <h3>📊 价格区间分布</h3>
-          {priceDist.length > 0 ? (
-            <div className="simple-chart">
-              {priceDist.map((item, i) => (
-                <div key={i} className="chart-bar-row">
-                  <span className="bar-label">{item.range_label}</span>
-                  <div className="bar-track">
-                    <div 
-                      className="bar-fill" 
-                      style={{ 
-                        width: `${Math.min((item.count / Math.max(...priceDist.map(p => p.count))) * 100, 100)}%`,
-                        background: `hsl(${i * 40 + 200}, 70%, 50%)`
-                      }}
-                    ></div>
-                  </div>
-                  <span className="bar-value">{item.count}台</span>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="no-data">暂无价格分布数据</p>
-          )}
-        </div>
-      </div>
-    </div>
-  )
-}
+  // ==========================================
+  // Loading 页面
+  // ==========================================
 
-// ========== 品牌分析 Tab ==========
-function BrandTab({ brandAvg, laptops }) {
-  const [selectedBrand, setSelectedBrand] = useState('')
-  const brands = [...new Set(laptops.map(item => item.brand).filter(Boolean))]
+  if (loading) {
 
-  // 筛选该品牌的数据
-  const filtered = selectedBrand 
-    ? laptops.filter(item => item.brand === selectedBrand)
-    : laptops
+    return (
 
-  const avgPrice = filtered.length > 0 
-    ? (filtered.reduce((sum, item) => sum + (item.price || 0), 0) / filtered.length).toFixed(0)
-    : 0
+      <div className="loading-page">
 
-  return (
-    <div>
-      <div className="filter-section">
-        <label>选择品牌：</label>
-        <select value={selectedBrand} onChange={(e) => setSelectedBrand(e.target.value)}>
-          <option value="">全部品牌</option>
-          {brands.map((brand, i) => (
-            <option key={i} value={brand}>{brand}</option>
-          ))}
-        </select>
-        {selectedBrand && (
-          <span className="brand-stats">
-            共 {filtered.length} 款 · 均价 ${avgPrice}
-          </span>
-        )}
-      </div>
+        <div className="loading-content">
 
-      <div className="brand-grid">
-        {brandAvg.map((item, i) => (
-          <div 
-            key={i} 
-            className={`brand-card ${selectedBrand === item.brand ? 'active' : ''}`}
-            onClick={() => setSelectedBrand(item.brand)}
-          >
-            <div className="brand-name">{item.brand}</div>
-            <div className="brand-price">${item.avg_price?.toFixed(0)}</div>
-            <div className="brand-count">{item.count} 款</div>
+          <div className="loading-logo">
+            L
           </div>
-        ))}
+
+          <h2>
+            CampusLaptop
+          </h2>
+
+          <p>
+            正在加载笔记本数据...
+          </p>
+
+          <div className="loading-spinner"></div>
+
+        </div>
+
       </div>
-    </div>
-  )
-}
 
-// ========== 数据列表 Tab ==========
-function ListTab({ laptops }) {
-  const [search, setSearch] = useState('')
-  const [sortBy, setSortBy] = useState('price')
-  const [sortOrder, setSortOrder] = useState('desc')
+    );
 
-  // 搜索过滤
-  const filtered = laptops.filter(item => 
-    (item.brand || '').toLowerCase().includes(search.toLowerCase()) ||
-    (item.name || '').toLowerCase().includes(search.toLowerCase())
-  )
+  }
 
-  // 排序
-  const sorted = [...filtered].sort((a, b) => {
-    const aVal = a[sortBy] || 0
-    const bVal = b[sortBy] || 0
-    if (typeof aVal === 'string') {
-      return sortOrder === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal)
-    }
-    return sortOrder === 'asc' ? aVal - bVal : bVal - aVal
-  })
+
+  // ==========================================
+  // API 连接失败页面
+  // ==========================================
+
+  if (error) {
+
+    return (
+
+      <div className="error-page">
+
+        <div className="error-card">
+
+          <div className="error-icon">
+            !
+          </div>
+
+          <h2>
+            数据服务连接失败
+          </h2>
+
+          <p>
+            {error}
+          </p>
+
+
+          <div className="error-help">
+
+            <strong>
+              请检查以下内容：
+            </strong>
+
+            <ol>
+
+              <li>
+                Flask 后端是否运行在 8000 端口
+              </li>
+
+              <li>
+                SQLite 数据库是否已经准备完成
+              </li>
+
+              <li>
+                前端 Vite 服务是否已经启动
+              </li>
+
+              <li>
+                vite.config.js 是否配置了 API 代理
+              </li>
+
+            </ol>
+
+          </div>
+
+
+          <button
+            className="retry-button"
+            onClick={loadData}
+          >
+            重新连接
+          </button>
+
+        </div>
+
+      </div>
+
+    );
+
+  }
+
+
+  // ==========================================
+  // 正常页面
+  // ==========================================
 
   return (
-    <div>
-      <div className="list-controls">
-        <input 
-          type="text" 
-          placeholder="🔍 搜索品牌或型号..." 
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="search-input"
-        />
-        <div className="sort-controls">
-          <label>排序：</label>
-          <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-            <option value="price">价格</option>
-            <option value="brand">品牌</option>
-            <option value="rating">评分</option>
-          </select>
-          <button onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}>
-            {sortOrder === 'asc' ? '↑' : '↓'}
-          </button>
-        </div>
-      </div>
 
-      <div className="table-wrapper">
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>品牌</th>
-              <th>型号</th>
-              <th>CPU</th>
-              <th>内存</th>
-              <th>价格 (USD)</th>
-              <th>评分</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sorted.length === 0 ? (
-              <tr><td colSpan="7" className="no-data">没有匹配的数据</td></tr>
-            ) : (
-              sorted.slice(0, 50).map((item, index) => (
-                <tr key={index}>
-                  <td>{index + 1}</td>
-                  <td><span className="brand-tag">{item.brand || '未知'}</span></td>
-                  <td>{item.name?.slice(0, 35) || '未知型号'}</td>
-                  <td>{item.cpu || '-'}</td>
-                  <td>{item.memory || '-'}</td>
-                  <td className="price-cell">${item.price?.toFixed(2)}</td>
-                  <td>{item.rating || '-'}</td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+    <div className="app">
+
+
+      {/* ======================================
+          顶部导航
+      ======================================= */}
+
+      <Navbar
+        currentPage={currentPage}
+        onPageChange={handlePageChange}
+      />
+
+
+      {/* ======================================
+          页面主体
+      ======================================= */}
+
+      <main className="main-content">
+
+
+        {/* ===============================
+            首页
+        ================================ */}
+
+        {currentPage === "home" && (
+
+          <Home
+            laptops={laptops}
+            brands={brands}
+            brandAvg={brandAvg}
+            priceDist={priceDist}
+            onPageChange={handlePageChange}
+          />
+
+        )}
+
+
+        {/* ===============================
+            笔记本查询
+        ================================ */}
+
+        {currentPage === "search" && (
+
+          <Search
+            laptops={laptops}
+            brands={brands}
+          />
+
+        )}
+
+
+        {/* ===============================
+            智能推荐
+        ================================ */}
+
+        {currentPage === "recommend" && (
+
+          <Recommend
+            laptops={laptops}
+            onPageChange={handlePageChange}
+          />
+
+        )}
+
+
+        {/* ===============================
+            数据分析
+        ================================ */}
+
+        {currentPage === "analysis" && (
+
+          <Analysis
+            laptops={laptops}
+            brandAvg={brandAvg}
+            priceDist={priceDist}
+          />
+
+        )}
+
+      </main>
+
+
+      {/* ======================================
+          底部 Footer
+      ======================================= */}
+
+      <Footer />
+
+
     </div>
-  )
+
+  );
+
 }
 
-export default App
+
+export default App;
