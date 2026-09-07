@@ -1,41 +1,40 @@
 import React from "react";
 
-
 function LaptopDetail({
   laptop,
   onClose,
 }) {
-
+  // 没有选择笔记本时不显示
   if (!laptop) {
     return null;
   }
 
-
-  // ==========================================
-  // 价格
-  // ==========================================
-
-  const price = Number(
-    laptop.price || 0
-  );
-
-
-  const displayPrice =
-    price > 0
-      ? `$${price.toLocaleString()}`
-      : "价格未知";
-
-
-  // ==========================================
-  // 评分
-  // ==========================================
+  const price = Number(laptop.price) || 0;
 
   const rating =
     laptop.rating !== null &&
     laptop.rating !== undefined &&
     laptop.rating !== ""
-      ? Number(laptop.rating)
-      : null;
+      ? laptop.rating
+      : "--";
+
+  const reviewCount =
+    Number(laptop.review_count) || 0;
+
+
+  // ==========================================
+  // 格式化价格
+  // ==========================================
+
+  function formatPrice(value) {
+    if (!value) {
+      return "--";
+    }
+
+    return `$${value.toLocaleString(undefined, {
+      maximumFractionDigits: 0,
+    })}`;
+  }
 
 
   // ==========================================
@@ -43,114 +42,112 @@ function LaptopDetail({
   // ==========================================
 
   const specifications = [
-
     {
       label: "品牌",
       value: laptop.brand || "未知",
     },
-
     {
       label: "产品名称",
-      value: laptop.name || "未知",
+      value: laptop.name || "未知型号",
     },
-
     {
       label: "CPU 品牌",
       value: laptop.cpu_brand || "未知",
     },
-
     {
       label: "处理器",
       value: laptop.cpu || "未知",
     },
-
     {
-      label: "CPU 核心",
-      value:
-        laptop.cpu_cores !== null &&
-        laptop.cpu_cores !== undefined
-          ? laptop.cpu_cores
-          : "未知",
+      label: "CPU 核心数",
+      value: laptop.cpu_cores || "未知",
     },
-
     {
-      label: "CPU 线程",
-      value:
-        laptop.cpu_threads !== null &&
-        laptop.cpu_threads !== undefined
-          ? laptop.cpu_threads
-          : "未知",
+      label: "CPU 线程数",
+      value: laptop.cpu_threads || "未知",
     },
-
     {
       label: "内存",
-      value: laptop.memory || "未知",
+      value: laptop.memory
+        ? String(laptop.memory).toLowerCase().includes("gb")
+          ? laptop.memory
+          : `${laptop.memory} GB`
+        : "未知",
     },
-
     {
       label: "存储",
-      value: laptop.storage || "未知",
+      value: laptop.storage
+        ? String(laptop.storage).toLowerCase().includes("gb")
+          ? laptop.storage
+          : `${laptop.storage} GB`
+        : "未知",
     },
-
     {
-      label: "显卡品牌",
+      label: "GPU 品牌",
       value: laptop.gpu_brand || "未知",
     },
-
     {
       label: "显卡",
       value: laptop.gpu || "未知",
     },
-
-    {
-      label: "评价数量",
-      value:
-        laptop.review_count !== null &&
-        laptop.review_count !== undefined
-          ? laptop.review_count
-          : 0,
-    },
-
   ];
 
 
-  return (
+  // ==========================================
+  // 点击背景关闭
+  // ==========================================
 
+  function handleOverlayClick(event) {
+
+    if (event.target === event.currentTarget) {
+
+      if (onClose) {
+        onClose();
+      }
+
+    }
+
+  }
+
+
+  return (
     <div
-      className="detail-overlay"
-      onClick={onClose}
+      className="laptop-detail-overlay"
+      onClick={handleOverlayClick}
     >
 
+      <div className="laptop-detail-modal">
 
-      <div
-        className="laptop-detail-modal"
-        onClick={(event) =>
-          event.stopPropagation()
-        }
-      >
+        {/* ====================================
+            顶部
+        ==================================== */}
 
+        <div className="laptop-detail-header">
 
-        {/* =====================================
-            弹窗头部
-        ====================================== */}
+          <div className="detail-header-left">
 
-        <div className="detail-header">
+            <div className="detail-laptop-icon">
+              💻
+            </div>
 
-          <div>
+            <div>
 
-            <span className="detail-brand">
-              {laptop.brand || "未知品牌"}
-            </span>
+              <span className="detail-brand">
+                {laptop.brand || "未知品牌"}
+              </span>
 
-            <h2>
-              {laptop.name || "未知型号"}
-            </h2>
+              <h2>
+                {laptop.name || "未知型号"}
+              </h2>
+
+            </div>
 
           </div>
 
 
           <button
-            className="detail-close"
+            type="button"
+            className="detail-close-button"
             onClick={onClose}
             aria-label="关闭"
           >
@@ -160,86 +157,103 @@ function LaptopDetail({
         </div>
 
 
-        {/* =====================================
-            价格区域
-        ====================================== */}
+        {/* ====================================
+            核心数据
+        ==================================== */}
 
-        <div className="detail-price-section">
+        <div className="detail-summary">
 
-          <div>
+          <div className="detail-summary-item">
 
-            <span className="detail-price-label">
+            <small>
               参考价格
-            </span>
+            </small>
 
-            <div className="detail-price">
-              {displayPrice}
-            </div>
+            <strong className="detail-price">
+              {formatPrice(price)}
+            </strong>
 
           </div>
 
 
-          {rating !== null && (
+          <div className="detail-summary-item">
 
-            <div className="detail-rating">
+            <small>
+              用户评分
+            </small>
 
-              <span>
-                综合评分
-              </span>
+            <strong className="detail-rating">
+              ★ {rating}
+            </strong>
 
-              <strong>
-                ★ {rating.toFixed(1)}
-              </strong>
+          </div>
 
-            </div>
 
-          )}
+          <div className="detail-summary-item">
+
+            <small>
+              评价数量
+            </small>
+
+            <strong>
+              {reviewCount > 0
+                ? reviewCount.toLocaleString()
+                : "--"}
+            </strong>
+
+          </div>
 
         </div>
 
 
-        {/* =====================================
-            配置
-        ====================================== */}
+        {/* ====================================
+            详细配置
+        ==================================== */}
 
         <div className="detail-section">
 
           <div className="detail-section-title">
-            硬件配置
+
+            <span>
+              SPECIFICATIONS
+            </span>
+
+            <h3>
+              详细配置
+            </h3>
+
           </div>
 
 
           <div className="detail-spec-grid">
 
-            {specifications.map(
-              (item, index) => (
+            {specifications.map((item) => (
 
-                <div
-                  className="detail-spec-item"
-                  key={`${item.label}-${index}`}
-                >
+              <div
+                className="detail-spec-item"
+                key={item.label}
+              >
 
-                  <span className="detail-spec-label">
-                    {item.label}
-                  </span>
+                <span>
+                  {item.label}
+                </span>
 
-                  <span className="detail-spec-value">
-                    {item.value}
-                  </span>
+                <strong title={String(item.value)}>
+                  {item.value}
+                </strong>
 
-                </div>
+              </div>
 
-              )
-            )}
+            ))}
 
           </div>
 
         </div>
 
 
-        {/* =====================================
+        {/* ====================================
             数据来源
-        ====================================== */}
+        ==================================== */}
 
         <div className="detail-source">
 
@@ -250,7 +264,7 @@ function LaptopDetail({
             </span>
 
             <strong>
-              {laptop.source || "数据库"}
+              {laptop.source || "暂无"}
             </strong>
 
           </div>
@@ -259,11 +273,11 @@ function LaptopDetail({
           <div>
 
             <span>
-              抓取日期
+              数据日期
             </span>
 
             <strong>
-              {laptop.crawl_date || "未知"}
+              {laptop.crawl_date || "暂无"}
             </strong>
 
           </div>
@@ -271,29 +285,26 @@ function LaptopDetail({
         </div>
 
 
-        {/* =====================================
-            底部
-        ====================================== */}
+        {/* ====================================
+            底部按钮
+        ==================================== */}
 
         <div className="detail-footer">
 
           <button
-            className="button button-primary"
+            type="button"
+            className="detail-back-button"
             onClick={onClose}
           >
-            关闭详情
+            返回查询结果
           </button>
 
         </div>
 
-
       </div>
 
     </div>
-
   );
-
 }
-
 
 export default LaptopDetail;

@@ -226,7 +226,7 @@ function Analysis() {
                   </span>
 
                   <strong>
-                    {totalBrands}
+                    {totalBrands}|
                   </strong>
 
                   <small>
@@ -244,7 +244,7 @@ function Analysis() {
                   </span>
 
                   <strong>
-                    {totalLaptops}
+                    {totalLaptops}|
                   </strong>
 
                   <small>
@@ -262,7 +262,7 @@ function Analysis() {
                   </span>
 
                   <strong>
-                    ${averagePrice.toFixed(0)}
+                    ${averagePrice.toFixed(0)}|
                   </strong>
 
                   <small>
@@ -282,7 +282,7 @@ function Analysis() {
                   <strong>
                     {highestBrand
                       ? highestBrand.brand
-                      : "--"}
+                      : "--"}|
                   </strong>
 
                   <small>

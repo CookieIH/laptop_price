@@ -3,7 +3,10 @@ import React from "react";
 
 function RecommendCard({
   laptop,
-  rank,
+  index = 0,
+  score = 0,
+  reasons = [],
+  onDetail,
 }) {
 
   if (!laptop) {
@@ -11,327 +14,213 @@ function RecommendCard({
   }
 
 
-  /*
-   * 推荐分数
-   *
-   * 如果后端以后返回 recommendation_score，
-   * 优先使用后端数据。
-   *
-   * 当前暂时根据已有数据生成一个展示分数。
-   */
-
-  const score =
-    laptop.recommendation_score ??
-    laptop.score ??
-    Math.max(
-      70,
-      96 - rank * 4
-    );
+  const price =
+    Number(laptop.price) || 0;
 
 
-  const safeScore = Math.min(
-    100,
-    Math.max(
-      0,
-      Number(score)
-    )
-  );
+  const rating =
+    laptop.rating || "--";
 
 
-  const price = Number(
-    laptop.price || 0
-  );
+  // ==========================================
+  // 价格
+  // ==========================================
 
+  function formatPrice(value) {
 
-  const formatPrice = () => {
-
-    if (!price) {
+    if (!value) {
       return "--";
     }
 
-    return `$${price.toLocaleString()}`;
-
-  };
-
-
-  const memory =
-    laptop.memory || "未知";
-
-  const storage =
-    laptop.storage || "未知";
-
-  const cpu =
-    laptop.cpu || "未知";
-
-  const gpu =
-    laptop.gpu || "集成显卡";
-
-
-
-  /*
-   * 根据分数生成简单的推荐理由。
-   */
-
-  const reasons = [];
-
-
-  if (price > 0) {
-
-    reasons.push(
-      "价格处于合理预算范围"
-    );
+    return `$${value.toLocaleString(undefined, {
+      maximumFractionDigits: 0,
+    })}`;
 
   }
 
 
-  if (
-    String(memory)
-      .toLowerCase()
-      .includes("16")
-  ) {
+  // ==========================================
+  // 默认推荐理由
+  // ==========================================
 
-    reasons.push(
-      "16GB 内存适合大学生多任务学习"
-    );
+  const defaultReasons = [
 
-  }
+    laptop.price
+      ? "价格符合你的预算范围"
+      : "价格信息可供参考",
 
+    laptop.memory
+      ? `拥有 ${laptop.memory}GB 内存`
+      : "内存配置较为均衡",
 
-  if (cpu !== "未知") {
+    laptop.cpu
+      ? `搭载 ${laptop.cpu}`
+      : "处理器配置满足日常需求",
 
-    reasons.push(
-      "处理器能够满足日常学习需求"
-    );
-
-  }
-
-
-  if (gpu !== "集成显卡") {
-
-    reasons.push(
-      "独立显卡适合图形或游戏需求"
-    );
-
-  }
+  ];
 
 
-  if (reasons.length === 0) {
-
-    reasons.push(
-      "综合配置与价格进行推荐"
-    );
-
-  }
-
+  const displayReasons =
+    reasons.length > 0
+      ? reasons
+      : defaultReasons;
 
 
   return (
-
     <article
       className={
-        `recommend-card ${
-          rank === 1
-            ? "recommend-card-first"
-            : ""
-        }`
+        index === 0
+          ? "recommend-card recommend-card-best"
+          : "recommend-card"
       }
     >
 
+      {/* ======================================
+          推荐标签
+      ====================================== */}
 
-      {/* =========================
-          卡片头部
-      ========================= */}
-
-      <div className="recommend-card-header">
+      <div className="recommend-card-top">
 
         <div className="recommend-rank">
 
-          <strong>
-            TOP {rank}
-          </strong>
-
-          <span>
-            推荐
-          </span>
+          {index === 0
+            ? "BEST MATCH"
+            : `RECOMMEND ${String(index + 1).padStart(2, "0")}`}
 
         </div>
 
 
-        <div className="recommend-score">
+        <div className="recommend-match">
+
+          <strong>
+            {Math.round(score)}%
+          </strong>
 
           <span>
             匹配度
           </span>
 
-          <strong>
-            {safeScore.toFixed(0)}
-          </strong>
-
         </div>
 
       </div>
 
 
-
-      {/* =========================
+      {/* ======================================
           产品信息
-      ========================= */}
+      ====================================== */}
 
-      <div className="recommend-product">
+      <div className="recommend-card-product">
 
-        <div className="recommend-product-brand">
-
-          {laptop.brand || "UNKNOWN"}
-
+        <div className="recommend-product-icon">
+          💻
         </div>
 
 
-        <h3>
-          {laptop.name || "未知型号"}
-        </h3>
+        <div className="recommend-product-info">
 
+          <span>
+            {laptop.brand || "未知品牌"}
+          </span>
 
-        <div className="recommend-price">
-
-          {formatPrice()}
+          <h3>
+            {laptop.name || "未知型号"}
+          </h3>
 
         </div>
 
       </div>
 
 
-
-      {/* =========================
+      {/* ======================================
           配置
-      ========================= */}
+      ====================================== */}
 
-      <div className="recommend-spec-list">
+      <div className="recommend-specs">
 
+        <div>
 
-        <div className="recommend-spec">
-
-          <span>
+          <small>
             CPU
-          </span>
+          </small>
 
-          <strong title={cpu}>
-            {cpu}
+          <strong title={laptop.cpu}>
+            {laptop.cpu || "--"}
           </strong>
 
         </div>
 
 
-        <div className="recommend-spec">
+        <div>
 
-          <span>
+          <small>
             内存
-          </span>
+          </small>
 
           <strong>
-            {memory}
+            {laptop.memory || "--"}
+            {!String(laptop.memory || "")
+              .toLowerCase()
+              .includes("gb") &&
+              laptop.memory
+              ? " GB"
+              : ""}
           </strong>
 
         </div>
 
 
-        <div className="recommend-spec">
+        <div>
 
-          <span>
+          <small>
             存储
-          </span>
+          </small>
 
           <strong>
-            {storage}
+            {laptop.storage || "--"}
+            {!String(laptop.storage || "")
+              .toLowerCase()
+              .includes("gb") &&
+              laptop.storage
+              ? " GB"
+              : ""}
           </strong>
 
         </div>
 
 
-        <div className="recommend-spec">
+        <div>
 
-          <span>
+          <small>
             GPU
-          </span>
+          </small>
 
-          <strong title={gpu}>
-            {gpu}
+          <strong title={laptop.gpu}>
+            {laptop.gpu || "--"}
           </strong>
-
-        </div>
-
-
-      </div>
-
-
-
-      {/* =========================
-          匹配度
-      ========================= */}
-
-      <div className="recommend-score-section">
-
-        <div className="recommend-score-title">
-
-          <span>
-            综合匹配度
-          </span>
-
-          <strong>
-            {safeScore.toFixed(0)}%
-          </strong>
-
-        </div>
-
-
-        <div className="score-bar">
-
-          <div
-            className="score-bar-inner"
-            style={{
-              width: `${safeScore}%`,
-            }}
-          ></div>
-
-        </div>
-
-
-        <div className="recommend-score-level">
-
-          {safeScore >= 90
-            ? "非常推荐"
-            : safeScore >= 80
-              ? "值得考虑"
-              : "可以参考"
-          }
 
         </div>
 
       </div>
 
 
-
-      {/* =========================
+      {/* ======================================
           推荐理由
-      ========================= */}
+      ====================================== */}
 
       <div className="recommend-reasons">
 
-        <div className="recommend-reasons-title">
-
-          推荐理由
-
-        </div>
+        <h4>
+          为什么推荐？
+        </h4>
 
 
-        {reasons
-          .slice(0, 3)
-          .map(
-            (reason, index) => (
+        <ul>
 
-              <div
-                className="recommend-reason"
-                key={index}
-              >
+          {displayReasons
+            .slice(0, 4)
+            .map((reason, reasonIndex) => (
+
+              <li key={reasonIndex}>
 
                 <span>
                   ✓
@@ -339,101 +228,69 @@ function RecommendCard({
 
                 {reason}
 
-              </div>
+              </li>
 
-            )
-          )}
+            ))}
 
-      </div>
-
-
-
-      {/* =========================
-          底部指标
-      ========================= */}
-
-      <div className="recommend-metrics">
-
-
-        <div className="metric">
-
-          <span>
-            价格
-          </span>
-
-          <strong>
-            {price
-              ? `${Math.round(price)}`
-              : "--"}
-          </strong>
-
-        </div>
-
-
-        <div className="metric">
-
-          <span>
-            内存
-          </span>
-
-          <strong>
-            {memory}
-          </strong>
-
-        </div>
-
-
-        <div className="metric">
-
-          <span>
-            评分
-          </span>
-
-          <strong>
-            {laptop.rating || "--"}
-          </strong>
-
-        </div>
-
-
-        <div className="metric">
-
-          <span>
-            评价
-          </span>
-
-          <strong>
-            {laptop.review_count || "--"}
-          </strong>
-
-        </div>
-
+        </ul>
 
       </div>
 
 
+      {/* ======================================
+          底部
+      ====================================== */}
 
-      {/* =========================
-          商品评价
-      ========================= */}
+      <div className="recommend-card-footer">
 
-      <div className="recommend-rating">
+        <div className="recommend-price">
 
-        <span>
-          数据来源
-        </span>
+          <small>
+            参考价格
+          </small>
 
-        <strong>
-          {laptop.source || "系统数据"}
-        </strong>
+          <strong>
+            {formatPrice(price)}
+          </strong>
+
+        </div>
+
+
+        <div className="recommend-rating">
+
+          <span>
+            ★
+          </span>
+
+          {rating}
+
+        </div>
+
+
+        <button
+          type="button"
+          className="recommend-detail-button"
+          onClick={() => {
+
+            if (onDetail) {
+              onDetail(laptop);
+            }
+
+          }}
+        >
+
+          查看详情
+
+          <span>
+            →
+          </span>
+
+        </button>
 
       </div>
-
 
     </article>
-
   );
-
 }
 
 

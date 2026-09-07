@@ -1,130 +1,107 @@
 import React from "react";
 
-
-function Navbar({
-  currentPage,
-  onPageChange,
-}) {
-
-  /**
-   * 导航菜单
-   */
-  const navItems = [
+function Navbar({ currentPage, onPageChange }) {
+  const menuItems = [
     {
       key: "home",
+      icon: "⌂",
       label: "首页",
     },
     {
       key: "search",
+      icon: "▣",
       label: "笔记本查询",
     },
     {
       key: "recommend",
+      icon: "☆",
       label: "智能推荐",
     },
     {
       key: "analysis",
+      icon: "▥",
       label: "数据分析",
     },
   ];
 
-
-  /**
-   * 点击导航
-   */
-  function handleClick(page) {
-
-    onPageChange(page);
-
-  }
-
-
   return (
+    <aside className="sidebar">
 
-    <header className="navbar">
+      {/* ==============================
+          Logo区域
+      ============================== */}
+      <div className="sidebar-logo">
 
-      <div className="navbar-inner">
-
-
-        {/* =====================================
-            Logo
-        ====================================== */}
-
-        <div
-          className="navbar-logo"
-          onClick={() => handleClick("home")}
-        >
-
-          <div className="navbar-logo-icon">
-            L
-          </div>
-
-          <div className="navbar-logo-text">
-
-            <div className="navbar-logo-title">
-              CampusLaptop
-            </div>
-
-            <div className="navbar-logo-subtitle">
-              大学生笔记本选购系统
-            </div>
-
-          </div>
-
+        <div className="logo-icon">
+          💻
         </div>
 
+        <div className="logo-text">
+          <div className="logo-title">
+            Laptop Price
+          </div>
 
-        {/* =====================================
-            导航菜单
-        ====================================== */}
-
-        <nav className="navbar-menu">
-
-          {navItems.map((item) => (
-
-            <button
-              key={item.key}
-              className={
-                currentPage === item.key
-                  ? "navbar-item active"
-                  : "navbar-item"
-              }
-              onClick={() =>
-                handleClick(item.key)
-              }
-            >
-
-              {item.label}
-
-            </button>
-
-          ))}
-
-        </nav>
-
-
-        {/* =====================================
-            API 状态
-        ====================================== */}
-
-        <div className="navbar-status">
-
-          <span className="navbar-status-dot"></span>
-
-          <span>
-            数据服务正常
-          </span>
-
+          <div className="logo-subtitle">
+            ANALYSIS SYSTEM
+          </div>
         </div>
-
 
       </div>
 
-    </header>
 
+      {/* ==============================
+          导航菜单
+      ============================== */}
+      <nav className="sidebar-nav">
+
+        {menuItems.map((item) => (
+
+          <button
+            key={item.key}
+            type="button"
+            className={`nav-item ${
+              currentPage === item.key ? "active" : ""
+            }`}
+            onClick={() => onPageChange(item.key)}
+          >
+
+            <span className="nav-icon">
+              {item.icon}
+            </span>
+
+            <span className="nav-label">
+              {item.label}
+            </span>
+
+          </button>
+
+        ))}
+
+      </nav>
+
+
+      {/* ==============================
+          左下角装饰区域
+          对应参考图中的电脑插画区域
+      ============================== */}
+      <div className="sidebar-decoration">
+
+        <div className="decoration-laptop">
+          💻
+        </div>
+
+        <div className="decoration-title">
+          更好的选择
+        </div>
+
+        <div className="decoration-text">
+          从数据开始
+        </div>
+
+      </div>
+
+    </aside>
   );
-
 }
-
 
 export default Navbar;

@@ -1,137 +1,62 @@
 import React from "react";
 
-
 function Footer() {
-
-  const currentYear = new Date().getFullYear();
-
-
   return (
-
     <footer className="footer">
 
-      <div className="footer-inner">
+      {/* ==============================
+          左侧：系统名称
+      ============================== */}
+      <div className="footer-left">
+        <span className="footer-logo">▰</span>
+
+        <span className="footer-title">
+          Laptop Price Analysis
+        </span>
+      </div>
 
 
-        {/* =================================
-            左侧
-        ================================= */}
+      {/* ==============================
+          中间：快速导航
+      ============================== */}
+      <div className="footer-center">
 
-        <div className="footer-brand">
+        <button type="button">
+          数据分析
+        </button>
 
-          <div className="footer-logo">
-            L
-          </div>
+        <span className="footer-divider">|</span>
 
-          <div>
+        <button type="button">
+          智能推荐
+        </button>
 
-            <div className="footer-title">
-              CampusLaptop
-            </div>
+        <span className="footer-divider">|</span>
 
-            <div className="footer-description">
-              大学生笔记本价格预测与推荐系统
-            </div>
-
-          </div>
-
-        </div>
-
-
-        {/* =================================
-            中间
-        ================================= */}
-
-        <div className="footer-info">
-
-          <div className="footer-info-title">
-            系统功能
-          </div>
-
-          <div className="footer-links">
-
-            <span>
-              笔记本查询
-            </span>
-
-            <span>
-              智能推荐
-            </span>
-
-            <span>
-              数据分析
-            </span>
-
-            <span>
-              价格预测
-            </span>
-
-          </div>
-
-        </div>
-
-
-        {/* =================================
-            右侧
-        ================================= */}
-
-        <div className="footer-tech">
-
-          <div className="footer-info-title">
-            技术架构
-          </div>
-
-          <div className="tech-tags">
-
-            <span>
-              Flask
-            </span>
-
-            <span>
-              SQLite
-            </span>
-
-            <span>
-              React
-            </span>
-
-            <span>
-              Vite
-            </span>
-
-          </div>
-
-        </div>
-
+        <button type="button">
+          笔记本查询
+        </button>
 
       </div>
 
 
-      {/* =================================
-          底部版权
-      ================================= */}
-
-      <div className="footer-bottom">
+      {/* ==============================
+          右侧：数据来源 + 版权
+      ============================== */}
+      <div className="footer-right">
 
         <span>
-          © {currentYear} CampusLaptop
+          数据来源：公开数据集
         </span>
 
-        <span>
-          大学生笔记本选购辅助系统
-        </span>
-
-        <span>
-          课程项目
+        <span className="footer-divider">
+          © 2026 Laptop Price Analysis
         </span>
 
       </div>
 
     </footer>
-
   );
-
 }
-
 
 export default Footer;

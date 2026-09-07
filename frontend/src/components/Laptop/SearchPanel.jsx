@@ -1,381 +1,426 @@
-import React from "react";
-
+import React, { useState } from "react";
 
 function SearchPanel({
-  filters = {},
   brands = [],
-  onFilterChange,
+  onSearch,
   onReset,
 }) {
+  // ==========================================
+  // 查询条件
+  // ==========================================
+
+  const [name, setName] = useState("");
+  const [brand, setBrand] = useState("");
+  const [cpu, setCpu] = useState("");
+  const [memory, setMemory] = useState("");
+  const [storage, setStorage] = useState("");
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
 
 
   // ==========================================
-  // 修改输入框
+  // CPU选项
   // ==========================================
 
-  function handleChange(
-    key,
-    value
-  ) {
+  const cpuOptions = [
+    "Intel",
+    "AMD",
+    "Apple",
+    "Qualcomm",
+  ];
 
-    onFilterChange(
-      key,
-      value
-    );
 
+  // ==========================================
+  // 内存选项
+  // ==========================================
+
+  const memoryOptions = [
+    "4",
+    "8",
+    "16",
+    "32",
+    "64",
+  ];
+
+
+  // ==========================================
+  // 存储选项
+  // ==========================================
+
+  const storageOptions = [
+    "128",
+    "256",
+    "512",
+    "1024",
+    "2048",
+  ];
+
+
+  // ==========================================
+  // 执行查询
+  // ==========================================
+
+  function handleSearch(event) {
+
+    event.preventDefault();
+
+    const filters = {
+      name: name.trim(),
+      brand,
+      cpu,
+      memory,
+      storage,
+      minPrice,
+      maxPrice,
+    };
+
+    if (onSearch) {
+      onSearch(filters);
+    }
+  }
+
+
+  // ==========================================
+  // 重置
+  // ==========================================
+
+  function handleReset() {
+
+    setName("");
+    setBrand("");
+    setCpu("");
+    setMemory("");
+    setStorage("");
+    setMinPrice("");
+    setMaxPrice("");
+
+    if (onReset) {
+      onReset();
+    }
   }
 
 
   return (
+    <section className="search-panel">
 
-    <div className="search-panel">
-
-
-      {/* =====================================
-          搜索面板标题
+      {/* ======================================
+          筛选标题
       ====================================== */}
 
       <div className="search-panel-header">
 
         <div>
 
-          <span className="search-panel-label">
-            FILTER
+          <span className="search-panel-tag">
+            LAPTOP SEARCH
           </span>
 
           <h2>
-            筛选笔记本
+            查找笔记本
           </h2>
 
+          <p>
+            根据你的需求筛选合适的笔记本电脑
+          </p>
+
         </div>
 
 
-        <button
-          className="reset-button"
-          onClick={onReset}
-        >
-
-          清空条件
-
-        </button>
+        <div className="search-panel-icon">
+          🔍
+        </div>
 
       </div>
 
 
-      {/* =====================================
-          第一行：名称 + 品牌
+      {/* ======================================
+          查询表单
       ====================================== */}
 
-      <div className="search-form-grid">
+      <form
+        className="search-form"
+        onSubmit={handleSearch}
+      >
 
+        {/* ==================================
+            第一行：名称 + 品牌
+        ================================== */}
 
-        {/* 名称 */}
+        <div className="search-form-row">
 
-        <div className="form-group">
+          <div className="search-field search-field-large">
 
-          <label>
-            笔记本名称
-          </label>
+            <label>
+              笔记本名称
+            </label>
 
-          <div className="input-wrapper">
+            <div className="input-with-icon">
 
-            <span className="input-icon">
-              ⌕
-            </span>
+              <span>
+                🔎
+              </span>
 
-            <input
-              type="text"
-              value={filters.name || ""}
-              onChange={(event) =>
-                handleChange(
-                  "name",
-                  event.target.value
-                )
-              }
-              placeholder="例如：ThinkPad、MacBook..."
-            />
+              <input
+                type="text"
+                value={name}
+                onChange={(event) =>
+                  setName(event.target.value)
+                }
+                placeholder="例如：ThinkPad、MacBook、Inspiron"
+              />
+
+            </div>
 
           </div>
 
-        </div>
 
+          <div className="search-field">
 
-        {/* 品牌 */}
+            <label>
+              品牌
+            </label>
 
-        <div className="form-group">
+            <select
+              value={brand}
+              onChange={(event) =>
+                setBrand(event.target.value)
+              }
+            >
 
-          <label>
-            品牌
-          </label>
+              <option value="">
+                全部品牌
+              </option>
 
-          <select
-            value={filters.brand || ""}
-            onChange={(event) =>
-              handleChange(
-                "brand",
-                event.target.value
-              )
-            }
-          >
-
-            <option value="">
-              全部品牌
-            </option>
-
-            {brands.map(
-              (brand, index) => (
+              {brands.map((item) => (
 
                 <option
-                  value={brand}
-                  key={`${brand}-${index}`}
+                  key={item}
+                  value={item}
                 >
-                  {brand}
+                  {item}
                 </option>
 
-              )
-            )}
+              ))}
 
-          </select>
-
-        </div>
-
-
-      </div>
-
-
-      {/* =====================================
-          第二行：CPU + 内存 + 存储
-      ====================================== */}
-
-      <div className="search-form-grid search-form-grid-three">
-
-
-        {/* CPU */}
-
-        <div className="form-group">
-
-          <label>
-            CPU
-          </label>
-
-          <input
-            type="text"
-            value={filters.cpu || ""}
-            onChange={(event) =>
-              handleChange(
-                "cpu",
-                event.target.value
-              )
-            }
-            placeholder="例如：Intel Core i5"
-          />
-
-          <span className="form-hint">
-            支持关键词查询
-          </span>
-
-        </div>
-
-
-        {/* 内存 */}
-
-        <div className="form-group">
-
-          <label>
-            内存
-          </label>
-
-          <select
-            value={filters.memory || ""}
-            onChange={(event) =>
-              handleChange(
-                "memory",
-                event.target.value
-              )
-            }
-          >
-
-            <option value="">
-              不限内存
-            </option>
-
-            <option value="4GB">
-              4GB
-            </option>
-
-            <option value="8GB">
-              8GB
-            </option>
-
-            <option value="16GB">
-              16GB
-            </option>
-
-            <option value="32GB">
-              32GB
-            </option>
-
-            <option value="64GB">
-              64GB
-            </option>
-
-          </select>
-
-        </div>
-
-
-        {/* 存储 */}
-
-        <div className="form-group">
-
-          <label>
-            存储
-          </label>
-
-          <select
-            value={filters.storage || ""}
-            onChange={(event) =>
-              handleChange(
-                "storage",
-                event.target.value
-              )
-            }
-          >
-
-            <option value="">
-              不限存储
-            </option>
-
-            <option value="128GB">
-              128GB
-            </option>
-
-            <option value="256GB">
-              256GB
-            </option>
-
-            <option value="512GB">
-              512GB
-            </option>
-
-            <option value="1TB">
-              1TB
-            </option>
-
-            <option value="2TB">
-              2TB
-            </option>
-
-          </select>
-
-        </div>
-
-
-      </div>
-
-
-      {/* =====================================
-          第三行：价格
-      ====================================== */}
-
-      <div className="search-price-row">
-
-
-        <div className="form-group">
-
-          <label>
-            最低价格
-          </label>
-
-          <div className="price-input">
-
-            <span>
-              $
-            </span>
-
-            <input
-              type="number"
-              min="0"
-              value={
-                filters.minPrice || ""
-              }
-              onChange={(event) =>
-                handleChange(
-                  "minPrice",
-                  event.target.value
-                )
-              }
-              placeholder="不限"
-            />
+            </select>
 
           </div>
 
         </div>
 
 
-        <span className="price-separator">
-          —
-        </span>
+        {/* ==================================
+            第二行：CPU + 内存 + 存储
+        ================================== */}
 
+        <div className="search-form-row three-columns">
 
-        <div className="form-group">
+          <div className="search-field">
 
-          <label>
-            最高价格
-          </label>
+            <label>
+              CPU 品牌
+            </label>
 
-          <div className="price-input">
-
-            <span>
-              $
-            </span>
-
-            <input
-              type="number"
-              min="0"
-              value={
-                filters.maxPrice || ""
-              }
+            <select
+              value={cpu}
               onChange={(event) =>
-                handleChange(
-                  "maxPrice",
-                  event.target.value
-                )
+                setCpu(event.target.value)
               }
-              placeholder="不限"
-            />
+            >
+
+              <option value="">
+                全部 CPU
+              </option>
+
+              {cpuOptions.map((item) => (
+
+                <option
+                  key={item}
+                  value={item}
+                >
+                  {item}
+                </option>
+
+              ))}
+
+            </select>
+
+          </div>
+
+
+          <div className="search-field">
+
+            <label>
+              内存
+            </label>
+
+            <select
+              value={memory}
+              onChange={(event) =>
+                setMemory(event.target.value)
+              }
+            >
+
+              <option value="">
+                全部内存
+              </option>
+
+              {memoryOptions.map((item) => (
+
+                <option
+                  key={item}
+                  value={item}
+                >
+                  {item} GB
+                </option>
+
+              ))}
+
+            </select>
+
+          </div>
+
+
+          <div className="search-field">
+
+            <label>
+              存储
+            </label>
+
+            <select
+              value={storage}
+              onChange={(event) =>
+                setStorage(event.target.value)
+              }
+            >
+
+              <option value="">
+                全部存储
+              </option>
+
+              {storageOptions.map((item) => (
+
+                <option
+                  key={item}
+                  value={item}
+                >
+                  {item} GB
+                </option>
+
+              ))}
+
+            </select>
 
           </div>
 
         </div>
 
 
-      </div>
+        {/* ==================================
+            第三行：价格
+        ================================== */}
+
+        <div className="search-form-row">
+
+          <div className="search-field">
+
+            <label>
+              最低价格
+            </label>
+
+            <div className="price-input">
+
+              <span>
+                $
+              </span>
+
+              <input
+                type="number"
+                min="0"
+                value={minPrice}
+                onChange={(event) =>
+                  setMinPrice(event.target.value)
+                }
+                placeholder="最低价格"
+              />
+
+            </div>
+
+          </div>
 
 
-      {/* =====================================
-          搜索提示
-      ====================================== */}
+          <div className="search-field">
 
-      <div className="search-panel-tip">
+            <label>
+              最高价格
+            </label>
 
-        <span className="tip-icon">
-          i
-        </span>
+            <div className="price-input">
 
-        <span>
-          筛选条件会实时应用到下方的产品列表，
-          无需额外点击搜索按钮。
-        </span>
+              <span>
+                $
+              </span>
 
-      </div>
+              <input
+                type="number"
+                min="0"
+                value={maxPrice}
+                onChange={(event) =>
+                  setMaxPrice(event.target.value)
+                }
+                placeholder="最高价格"
+              />
+
+            </div>
+
+          </div>
+
+        </div>
 
 
-    </div>
+        {/* ==================================
+            操作按钮
+        ================================== */}
 
+        <div className="search-actions">
+
+          <button
+            type="button"
+            className="search-reset-button"
+            onClick={handleReset}
+          >
+            ↻
+            <span>
+              重置条件
+            </span>
+          </button>
+
+
+          <button
+            type="submit"
+            className="search-submit-button"
+          >
+
+            <span>
+              🔍
+            </span>
+
+            <strong>
+              开始查询
+            </strong>
+
+            <span>
+              →
+            </span>
+
+          </button>
+
+        </div>
+
+      </form>
+
+    </section>
   );
-
 }
-
 
 export default SearchPanel;

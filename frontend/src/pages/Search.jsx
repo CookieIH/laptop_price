@@ -11,318 +11,278 @@ function Search({
 }) {
 
   // ==========================================
-  // 搜索条件
+  // 当前筛选条件
   // ==========================================
 
   const [filters, setFilters] = useState({
-
     name: "",
-
     brand: "",
-
     cpu: "",
-
     memory: "",
-
     storage: "",
-
     minPrice: "",
-
     maxPrice: "",
-
   });
 
 
   // ==========================================
-  // 当前选中的笔记本
+  // 是否已经进行搜索
   // ==========================================
 
-  const [selectedLaptop, setSelectedLaptop] =
-    useState(null);
-
-
-  // ==========================================
-  // 当前页
-  // ==========================================
-
-  const [currentPage, setCurrentPage] =
-    useState(1);
-
-
-  const pageSize = 12;
+  const [hasSearched, setHasSearched] = useState(false);
 
 
   // ==========================================
-  // 处理搜索条件变化
+  // 当前查看详情的笔记本
   // ==========================================
 
-  function handleFilterChange(
-    key,
-    value
-  ) {
+  const [selectedLaptop, setSelectedLaptop] = useState(null);
 
-    setFilters((prev) => ({
 
-      ...prev,
+  // ==========================================
+  // 执行搜索
+  // ==========================================
 
-      [key]: value,
+  function handleSearch(searchFilters) {
 
-    }));
+    setFilters(searchFilters);
 
-    // 修改条件后回到第一页
+    setHasSearched(true);
 
-    setCurrentPage(1);
+    // 搜索后回到结果区域
 
+    setTimeout(() => {
+
+      const resultElement =
+        document.getElementById("search-results");
+
+      if (resultElement) {
+
+        resultElement.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+
+      }
+
+    }, 100);
   }
 
 
   // ==========================================
-  // 清空搜索
+  // 重置搜索
   // ==========================================
 
   function handleReset() {
 
     setFilters({
-
       name: "",
-
       brand: "",
-
       cpu: "",
-
       memory: "",
-
       storage: "",
-
       minPrice: "",
-
       maxPrice: "",
-
     });
 
-    setCurrentPage(1);
-
+    setHasSearched(false);
   }
 
 
   // ==========================================
-  // 根据条件筛选笔记本
+  // 筛选数据
   // ==========================================
 
   const filteredLaptops = useMemo(() => {
 
-    return laptops.filter((laptop) => {
+    let result = [...laptops];
 
-      // ------------------------------
-      // 名称
-      // ------------------------------
 
-      if (
-        filters.name &&
-        !String(laptop.name || "")
+    // ------------------------------------------
+    // 名称
+    // ------------------------------------------
+
+    if (filters.name) {
+
+      const keyword =
+        filters.name.toLowerCase();
+
+      result = result.filter((laptop) => {
+
+        const name =
+          String(laptop.name || "")
+            .toLowerCase();
+
+        return name.includes(keyword);
+
+      });
+
+    }
+
+
+    // ------------------------------------------
+    // 品牌
+    // ------------------------------------------
+
+    if (filters.brand) {
+
+      result = result.filter((laptop) => {
+
+        return String(laptop.brand || "")
           .toLowerCase()
           .includes(
-            filters.name.toLowerCase()
-          )
-      ) {
+            String(filters.brand).toLowerCase()
+          );
 
-        return false;
+      });
 
-      }
-
-
-      // ------------------------------
-      // 品牌
-      // ------------------------------
-
-      if (
-        filters.brand &&
-        laptop.brand !== filters.brand
-      ) {
-
-        return false;
-
-      }
+    }
 
 
-      // ------------------------------
-      // CPU
-      // ------------------------------
+    // ------------------------------------------
+    // CPU
+    // ------------------------------------------
 
-      if (
-        filters.cpu &&
-        !String(laptop.cpu || "")
-          .toLowerCase()
-          .includes(
-            filters.cpu.toLowerCase()
-          )
-      ) {
+    if (filters.cpu) {
 
-        return false;
+      result = result.filter((laptop) => {
 
-      }
+        const cpuBrand =
+          String(laptop.cpu_brand || "")
+            .toLowerCase();
 
+        const cpu =
+          String(laptop.cpu || "")
+            .toLowerCase();
 
-      // ------------------------------
-      // 内存
-      // ------------------------------
+        const keyword =
+          String(filters.cpu)
+            .toLowerCase();
 
-      if (
-        filters.memory &&
-        !String(laptop.memory || "")
-          .toLowerCase()
-          .includes(
-            filters.memory.toLowerCase()
-          )
-      ) {
+        return (
+          cpuBrand.includes(keyword) ||
+          cpu.includes(keyword)
+        );
 
-        return false;
+      });
 
-      }
+    }
 
 
-      // ------------------------------
-      // 存储
-      // ------------------------------
+    // ------------------------------------------
+    // 内存
+    // ------------------------------------------
 
-      if (
-        filters.storage &&
-        !String(laptop.storage || "")
-          .toLowerCase()
-          .includes(
-            filters.storage.toLowerCase()
-          )
-      ) {
+    if (filters.memory) {
 
-        return false;
+      const targetMemory =
+        Number(filters.memory);
 
-      }
+      result = result.filter((laptop) => {
 
+        const memory =
+          parseFloat(
+            String(laptop.memory || "")
+          );
 
-      // ------------------------------
-      // 最低价格
-      // ------------------------------
+        return memory === targetMemory;
 
-      const price = Number(
-        laptop.price || 0
-      );
+      });
+
+    }
 
 
-      if (
-        filters.minPrice &&
-        price < Number(filters.minPrice)
-      ) {
+    // ------------------------------------------
+    // 存储
+    // ------------------------------------------
 
-        return false;
+    if (filters.storage) {
 
-      }
+      const targetStorage =
+        Number(filters.storage);
+
+      result = result.filter((laptop) => {
+
+        const storage =
+          parseFloat(
+            String(laptop.storage || "")
+          );
+
+        return storage === targetStorage;
+
+      });
+
+    }
 
 
-      // ------------------------------
-      // 最高价格
-      // ------------------------------
+    // ------------------------------------------
+    // 最低价格
+    // ------------------------------------------
 
-      if (
-        filters.maxPrice &&
-        price > Number(filters.maxPrice)
-      ) {
+    if (filters.minPrice !== "") {
 
-        return false;
+      const min =
+        Number(filters.minPrice);
 
-      }
+      result = result.filter((laptop) => {
+
+        const price =
+          Number(laptop.price) || 0;
+
+        return price >= min;
+
+      });
+
+    }
 
 
-      return true;
+    // ------------------------------------------
+    // 最高价格
+    // ------------------------------------------
 
-    });
+    if (filters.maxPrice !== "") {
+
+      const max =
+        Number(filters.maxPrice);
+
+      result = result.filter((laptop) => {
+
+        const price =
+          Number(laptop.price) || 0;
+
+        return price <= max;
+
+      });
+
+    }
+
+
+    return result;
 
   }, [laptops, filters]);
 
 
   // ==========================================
-  // 分页
+  // 默认显示的数据
   // ==========================================
 
-  const totalPages = Math.max(
-    1,
-    Math.ceil(
-      filteredLaptops.length / pageSize
-    )
-  );
-
-
-  const startIndex =
-    (currentPage - 1) * pageSize;
-
-
-  const currentLaptops =
-    filteredLaptops.slice(
-      startIndex,
-      startIndex + pageSize
-    );
-
-
-  // ==========================================
-  // 页码切换
-  // ==========================================
-
-  function handlePageChange(page) {
-
-    if (
-      page < 1 ||
-      page > totalPages
-    ) {
-
-      return;
-
-    }
-
-    setCurrentPage(page);
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-
-  }
-
-
-  // ==========================================
-  // 打开详情
-  // ==========================================
-
-  function handleLaptopClick(laptop) {
-
-    setSelectedLaptop(laptop);
-
-  }
-
-
-  // ==========================================
-  // 关闭详情
-  // ==========================================
-
-  function handleCloseDetail() {
-
-    setSelectedLaptop(null);
-
-  }
+  const displayLaptops = hasSearched
+    ? filteredLaptops
+    : laptops;
 
 
   return (
+    <div className="page search-page">
 
-    <div className="search-page">
-
-
-      {/* =====================================
+      {/* ======================================
           页面标题
       ====================================== */}
 
-      <section className="page-header">
+      <section className="page-heading">
 
-        <div className="page-container">
+        <div>
 
-          <span className="section-label">
+          <span className="page-heading-tag">
             LAPTOP DATABASE
           </span>
 
@@ -331,8 +291,8 @@ function Search({
           </h1>
 
           <p>
-            根据品牌、名称、CPU、内存、存储和价格，
-            快速找到符合条件的笔记本电脑。
+            根据品牌、处理器、内存、存储和价格
+            快速找到符合需求的笔记本。
           </p>
 
         </div>
@@ -340,251 +300,132 @@ function Search({
       </section>
 
 
-      {/* =====================================
-          查询主体
+      {/* ======================================
+          搜索面板
       ====================================== */}
 
-      <section className="search-content">
-
-        <div className="page-container">
-
-
-          {/* 搜索面板 */}
-
-          <SearchPanel
-            filters={filters}
-            brands={brands}
-            onFilterChange={handleFilterChange}
-            onReset={handleReset}
-          />
+      <SearchPanel
+        brands={brands}
+        onSearch={handleSearch}
+        onReset={handleReset}
+      />
 
 
-          {/* =================================
-              查询结果标题
-          ================================== */}
+      {/* ======================================
+          查询结果
+      ====================================== */}
 
-          <div className="search-result-header">
+      <section
+        id="search-results"
+        className="search-results"
+      >
 
-            <div>
+        <div className="search-results-header">
 
-              <h2>
-                查询结果
-              </h2>
+          <div>
 
-              <p>
+            <span>
+              SEARCH RESULTS
+            </span>
 
-                共找到
-
-                <strong>
-                  {" "}
-                  {filteredLaptops.length}
-                  {" "}
-                </strong>
-
-                台笔记本
-
-              </p>
-
-            </div>
-
-
-            <div className="search-result-page">
-
-              第 {currentPage} / {totalPages} 页
-
-            </div>
+            <h2>
+              {hasSearched
+                ? "筛选结果"
+                : "全部笔记本"}
+            </h2>
 
           </div>
 
 
-          {/* =================================
-              没有结果
-          ================================== */}
+          <div className="result-count">
 
-          {currentLaptops.length === 0 && (
+            共
 
-            <div className="empty-result">
+            <strong>
+              {displayLaptops.length}
+            </strong>
 
-              <div className="empty-result-icon">
-                ?
-              </div>
+            台
 
-              <h3>
-                没有找到符合条件的笔记本
-              </h3>
-
-              <p>
-                可以尝试放宽价格范围，
-                或减少部分筛选条件。
-              </p>
-
-              <button
-                className="button button-primary"
-                onClick={handleReset}
-              >
-                清空筛选条件
-              </button>
-
-            </div>
-
-          )}
-
-
-          {/* =================================
-              笔记本列表
-          ================================== */}
-
-          {currentLaptops.length > 0 && (
-
-            <div className="laptop-grid">
-
-              {currentLaptops.map(
-                (laptop, index) => (
-
-                  <LaptopCard
-                    key={
-                      laptop.id ||
-                      `${laptop.brand}-${laptop.name}-${index}`
-                    }
-                    laptop={laptop}
-                    onClick={
-                      handleLaptopClick
-                    }
-                  />
-
-                )
-              )}
-
-            </div>
-
-          )}
-
-
-          {/* =================================
-              分页
-          ================================== */}
-
-          {filteredLaptops.length > 0 && (
-
-            <div className="pagination">
-
-              <button
-                className="pagination-button"
-                disabled={currentPage === 1}
-                onClick={() =>
-                  handlePageChange(
-                    currentPage - 1
-                  )
-                }
-              >
-                ←
-              </button>
-
-
-              {Array.from(
-                {
-                  length: Math.min(
-                    totalPages,
-                    7
-                  ),
-                },
-                (_, index) => {
-
-                  let pageNumber;
-
-                  if (totalPages <= 7) {
-
-                    pageNumber =
-                      index + 1;
-
-                  } else if (
-                    currentPage <= 4
-                  ) {
-
-                    pageNumber =
-                      index + 1;
-
-                  } else if (
-                    currentPage >=
-                    totalPages - 3
-                  ) {
-
-                    pageNumber =
-                      totalPages - 6 + index;
-
-                  } else {
-
-                    pageNumber =
-                      currentPage - 3 + index;
-
-                  }
-
-
-                  return (
-
-                    <button
-                      key={pageNumber}
-                      className={
-                        currentPage ===
-                        pageNumber
-                          ? "pagination-button active"
-                          : "pagination-button"
-                      }
-                      onClick={() =>
-                        handlePageChange(
-                          pageNumber
-                        )
-                      }
-                    >
-                      {pageNumber}
-                    </button>
-
-                  );
-
-                }
-              )}
-
-
-              <button
-                className="pagination-button"
-                disabled={
-                  currentPage === totalPages
-                }
-                onClick={() =>
-                  handlePageChange(
-                    currentPage + 1
-                  )
-                }
-              >
-                →
-              </button>
-
-            </div>
-
-          )}
+          </div>
 
         </div>
+
+
+        {/* ====================================
+            没有结果
+        ==================================== */}
+
+        {displayLaptops.length === 0 ? (
+
+          <div className="empty-search-result">
+
+            <div className="empty-search-icon">
+              🔍
+            </div>
+
+            <h3>
+              没有找到符合条件的笔记本
+            </h3>
+
+            <p>
+              可以尝试放宽价格范围，
+              或减少部分筛选条件。
+            </p>
+
+            <button
+              type="button"
+              onClick={handleReset}
+            >
+              重置筛选条件
+            </button>
+
+          </div>
+
+        ) : (
+
+          /* ==================================
+             卡片列表
+          ================================== */
+
+          <div className="laptop-card-grid">
+
+            {displayLaptops.map((laptop, index) => (
+
+              <LaptopCard
+                key={
+                  laptop.id ||
+                  `${laptop.brand}-${laptop.name}-${index}`
+                }
+                laptop={laptop}
+                index={index}
+                onDetail={setSelectedLaptop}
+              />
+
+            ))}
+
+          </div>
+
+        )}
 
       </section>
 
 
-      {/* =====================================
-          笔记本详情弹窗
+      {/* ======================================
+          详情弹窗
       ====================================== */}
 
       {selectedLaptop && (
 
         <LaptopDetail
           laptop={selectedLaptop}
-          onClose={handleCloseDetail}
+          onClose={() => setSelectedLaptop(null)}
         />
 
       )}
 
     </div>
-
   );
-
 }
 
 

@@ -1,156 +1,206 @@
 import React from "react";
 
-
-function formatPrice(price) {
-
-  if (!price || price <= 0) {
-    return "--";
-  }
-
-  return `$${Math.round(price).toLocaleString()}`;
-
-}
-
-
 function StatCards({
-  statistics = {},
+  laptops = [],
+  brands = [],
+  brandAvg = [],
+  priceDist = [],
 }) {
 
-  const {
+  // ==========================================
+  // 笔记本数量
+  // ==========================================
 
-    totalLaptops = 0,
+  const laptopCount = laptops.length;
 
-    totalBrands = 0,
 
-    minPrice = 0,
+  // ==========================================
+  // 品牌数量
+  // ==========================================
 
-    maxPrice = 0,
+  const brandCount = brands.length;
 
-    averagePrice = 0,
 
-  } = statistics;
+  // ==========================================
+  // 计算平均价格
+  // ==========================================
 
+  const prices = laptops
+    .map((item) => Number(item.price))
+    .filter((price) => price > 0);
+
+  const averagePrice =
+    prices.length > 0
+      ? prices.reduce((sum, price) => sum + price, 0) /
+        prices.length
+      : 0;
+
+
+  // ==========================================
+  // 找出数据最多的价格区间
+  // ==========================================
+
+  let popularPriceRange = "--";
+
+  if (priceDist.length > 0) {
+
+    const maxRange = [...priceDist].sort(
+      (a, b) => Number(b.count) - Number(a.count)
+    )[0];
+
+    if (maxRange) {
+      popularPriceRange =
+        maxRange.range_label || "--";
+    }
+  }
+
+
+  // ==========================================
+  // 格式化数字
+  // ==========================================
+
+  function formatNumber(number) {
+
+    if (!number) {
+      return "--";
+    }
+
+    return Number(number).toLocaleString();
+  }
+
+
+  // ==========================================
+  // 格式化价格
+  // ==========================================
+
+  function formatPrice(price) {
+
+    if (!price) {
+      return "--";
+    }
+
+    return `$${Number(price).toLocaleString(undefined, {
+      maximumFractionDigits: 0,
+    })}`;
+  }
+
+
+  // ==========================================
+  // 统计卡片
+  // ==========================================
 
   const cards = [
 
-    {
-      key: "laptops",
-
-      title: "笔记本数量",
-
-      value: totalLaptops,
-
-      suffix: " 台",
-
-      description: "当前数据库产品数量",
-
-      icon: "▣",
-
-    },
-
-    {
-      key: "brands",
-
-      title: "覆盖品牌",
-
-      value: totalBrands,
-
-      suffix: " 个",
-
-      description: "数据库中的品牌数量",
-
-      icon: "◇",
-
-    },
-
-    {
-      key: "average",
-
-      title: "平均价格",
-
-      value: formatPrice(averagePrice),
-
-      suffix: "",
-
-      description: "当前数据平均售价",
-
-      icon: "＄",
-
-    },
-
-    {
-      key: "range",
-
-      title: "价格范围",
-
-      value: formatPrice(minPrice),
-
-      suffix: "",
-
-      description:
-        `${formatPrice(minPrice)} - ${formatPrice(maxPrice)}`,
-
-      icon: "↕",
-
-    },
+    // {
+    //   key: "laptops",
+    //   icon: "💻",
+    //   label: "笔记本数据",
+    //   value: formatNumber(laptopCount),
+    //   unit: "台",
+    //   description: "当前数据集中的笔记本数量",
+    //   className: "stat-card-laptop",
+    // },
+// 
+    // {
+    //   key: "brands",
+    //   icon: "🏷",
+    //   label: "品牌数量",
+    //   value: formatNumber(brandCount),
+    //   unit: "个",
+    //   description: "当前数据集包含的品牌",
+    //   className: "stat-card-brand",
+    // },
+// 
+    // {
+    //   key: "average",
+    //   icon: "$",
+    //   label: "平均价格",
+    //   value: formatPrice(averagePrice),
+    //   unit: "",
+    //    description: "所有有效笔记本的平均价格",
+    //    className: "stat-card-price",
+    //  },
+//  
+    //  {
+    //    key: "range",
+    //    icon: "▤",
+    //    label: "主要价格区间",
+    //    value: popularPriceRange,
+    //    unit: "",
+    //    description: "数据量最多的价格区间",
+    //    className: "stat-card-range",
+    // },
 
   ];
 
 
   return (
-
-    <div className="stat-grid">
+    <div className="stat-cards">
 
       {cards.map((card) => (
 
         <div
-          className="stat-card"
+          className={`stat-card ${card.className}`}
           key={card.key}
         >
 
-          <div className="stat-card-top">
+          {/* ==================================
+              卡片顶部
+          ================================== */}
 
-            <div className="stat-card-icon">
+          <div className="stat-card-header">
 
+            <div className="stat-icon">
               {card.icon}
-
             </div>
 
-            <span className="stat-card-title">
-
-              {card.title}
-
+            <span className="stat-label">
+              {card.label}
             </span>
 
           </div>
 
 
-          <div className="stat-card-value">
+          {/* ==================================
+              数值
+          ================================== */}
 
-            {card.value}
+          <div className="stat-value">
 
-            <small>
-              {card.suffix}
-            </small>
+            <strong>
+              {card.value}
+            </strong>
+
+            {card.unit && (
+              <span className="stat-unit">
+                {card.unit}
+              </span>
+            )}
 
           </div>
 
 
-          <div className="stat-card-description">
+          {/* ==================================
+              说明
+          ================================== */}
 
+          <p className="stat-description">
             {card.description}
+          </p>
 
-          </div>
+
+          {/* ==================================
+              底部装饰线
+          ================================== */}
+
+          <div className="stat-line"></div>
 
         </div>
 
       ))}
 
     </div>
-
   );
-
 }
-
 
 export default StatCards;
