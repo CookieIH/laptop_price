@@ -241,18 +241,6 @@ function LaptopCard({
 
         </div>
 
-
-        <button
-          type="button"
-          className="laptop-detail-button"
-          onClick={handleDetail}
-        >
-          查看详情
-          <span>
-            →
-          </span>
-        </button>
-
       </div>
 
     </article>

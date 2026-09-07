@@ -269,15 +269,6 @@ function Home({
 
           </div>
 
-
-          <button
-            type="button"
-            className="outline-button"
-            onClick={goToSearch}
-          >
-            查看全部 →
-          </button>
-
         </div>
 
 
