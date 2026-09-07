@@ -141,8 +141,8 @@ def get_laptops():
     for r in rows:
         result.append({
             "id": r[12],
-            "brand": r[0] if r[0] else "未知品牌",      # ✅ 加上 brand
-            "name": r[1] if r[1] else "未知型号",        # ✅ 加上 name
+            "brand": r[0] if r[0] else "未知品牌", 
+            "name": r[1] if r[1] else "未知型号", 
             "cpu_brand": r[2],
             "cpu": r[3],
             "cpu_cores": r[4],
@@ -151,7 +151,7 @@ def get_laptops():
             "storage": r[7],
             "gpu_brand": r[8],
             "gpu": r[9],
-            "price": float(r[10]) if r[10] is not None else 0,  # ✅ 改为 price
+            "price": float(r[10]) if r[10] is not None else 0,
             "rating": r[11],
             "review_count": r[15] if len(r) > 15 else 0,
             "source": r[13] if len(r) > 13 else "",

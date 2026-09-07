@@ -186,11 +186,11 @@ def fetch_laptops():
             result_df["gpu"] = "未知GPU"
 
         # price 列
-        INR_TO_USD = 83.0
+        CNY_TO_USD = 6.71
         if "Price_USD" in df.columns:
             result_df["price"] = df["Price_USD"]
         elif "Price" in df.columns:
-            result_df["price"] = df["Price"] / INR_TO_USD
+            result_df["price"] = df["Price"] / CNY_TO_USD
         else:
             result_df["price"] = 0
 
