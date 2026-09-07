@@ -1,6 +1,8 @@
 # 有什么通知都在这上面说 直接更新在最上面就行
 
-### 直接运行main.py就可以开启api
+### 在backend/app/下执行 python main.py 开启api
+
+### 在frontend/app/下执行 npm run dev 开启前端
 
 ### 执行 pip install -r requirements.txt 一键安装所有依赖
 
